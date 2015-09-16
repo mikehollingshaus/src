@@ -9,7 +9,7 @@ package structures;
  *
  * @author u0214256
  */
-public class Migration extends DemographicComponent {
+public class Migration extends DemographicForce {
 
     public Migration(AgeSchedule aSch) {
         super(aSch);

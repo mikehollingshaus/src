@@ -9,7 +9,7 @@ package structures;
  *
  * @author u0214256
  */
-public class Fertility extends DemographicComponent {
+public class Fertility extends DemographicForce {
 
     public Fertility(AgeSchedule aSch) {
         super(aSch);

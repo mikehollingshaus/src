@@ -15,9 +15,18 @@ import mathematicalAttributes.NumericObjectVector;
  */
 public class PointPopulation {
 
-    private double totalCount;
-    private int year, month, day;
-    private AgeSchedule ageCounts;
+    private String name;
+    private PopDate date;
+    private double size;
+    Mortality mort;
+    Fertility fert;
+    Migration nonLMig, lMig;
+    PointPopulation[] subPops;
+    PopDefinition definition;
+    
+    
+    // A way to get the appropriate populations out of this arrayint[][][] 
+    
 
     /*private Fertility fertilityObject;
      private Mortality mortalityObject;
@@ -43,43 +52,12 @@ public class PointPopulation {
     }
 
     public PointPopulation(AgeSchedule ac, int year, int month, int day) {
-        checkDateValues(year, month, day);
+
         this.ageCounts = ac;
         this.year = year;
         this.month = month;
         this.day = day;
         this.totalCount = ageCounts.getTotalValue();
-    }
-
-    public void checkDateValues(int year, int month, int day) {
-        if (month < 1 || month > 12) {
-            throw new RuntimeException("Month must be an integer in the interval [1,12]");
-        }
-        if (day < 1 || day > 31) {
-            throw new RuntimeException("Day must be an integer in the interval [1,31]");
-        }
-        switch (month) {
-            case 9:
-            case 4:
-            case 6:
-            case 11:
-                if (day > 30) {
-                    throw new RuntimeException("For the months Sept, Apr, June, and Nov, day must be an integer in the interval [1,30]");
-                }
-                break;
-            case 2:
-                if (day > 29) {
-                    throw new RuntimeException("For the month of February, day must be an integer in the interval [1,29]");
-                }
-
-                if (day > 28 && !((year % 4 == 0 && year % 100 != 0) || year % 400 == 0)) {
-                    throw new RuntimeException("For the month of February in non-leap years, day must be an integer in the interval [1,28]");
-                }
-                break;
-            default:
-                break;
-
-        }
     }
 
     public PointPopulation applyAgeMortalitySchedule(Mortality m) {
@@ -96,7 +74,7 @@ public class PointPopulation {
         for (int i = 0; i < newAgeNums.length - 1; i++) {
             newAgeNums[i + 1] = new AgeSpecificNumber(calcCounts.getValueAtIndex(i), ageCounts.getValueAtIndex(i));
         }
-        NumericObject tempNum = new NumericObject(calcCounts.getValueAtIndex(calcCounts.length-1), false);
+        NumericObject tempNum = new NumericObject(calcCounts.getValueAtIndex(calcCounts.length - 1), false);
         newAgeNums[newAgeNums.length - 1] = new AgeSpecificNumber(newAgeNums[newAgeNums.length - 1].add(tempNum), ageCounts.getValueAtIndex(0));
 
         System.out.println("Test");
@@ -105,7 +83,7 @@ public class PointPopulation {
         return new PointPopulation(newSchedule, year + 1, month, day);
     }
 
-    private void checkScheduleLength(DemographicComponent dc) {
+    private void checkScheduleLength(DemographicForce dc) {
         if (dc.getAgeSchedule().length != ageCounts.length) {
             throw new RuntimeException("Tried to apply an age-schedule to a population with a different number of age groupings");
         }

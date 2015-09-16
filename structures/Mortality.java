@@ -9,7 +9,7 @@ package structures;
  *
  * @author u0214256
  */
-public class Mortality extends DemographicComponent {
+public class Mortality extends DemographicForce {
 
     public Mortality(AgeSchedule aSch) {
         super(aSch);

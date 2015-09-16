@@ -9,13 +9,13 @@ package structures;
  *
  * @author u0214256
  */
-public abstract class DemographicComponent {
+public abstract class DemographicForce {
     protected final AgeSchedule ageSchedule;
     
     /*
     Constructs a Demographic Component (mortality, fertility, or migration), from the given age schedule
     */
-    public DemographicComponent(AgeSchedule aSch){
+    public DemographicForce(AgeSchedule aSch){
         this.ageSchedule = aSch;
     }
 
