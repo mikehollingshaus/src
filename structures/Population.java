@@ -16,116 +16,68 @@ package structures;
  */
 public class Population {
 
-    // By definition, a population must be bounded by space and time. In this model, time is indicated by a time (year, month, day),
-    //    and space is indicated by a region
-    //          Additionally, for our purposes a population can have a "signature", which is determined by a series of strata.
-    //              An example stratum is Age, another is Sex
-    private final double totalSize, femSize, maleSize;
-
-    private final Time date;
-    private final Region region;
-
-    private double[] totData;
-    private AgeStructure totSructure, maleStructure, femStructure;
-
-    private final int numChildren;
-    private final Mortality mort;
-    private final Fertility fert;
-    private final Migration nonLaborMig, laborMig;
-
+    // The population value (i.e., the datapoints unique to this population (See object PopValue)
+    PopValue value;
+    // An ordered array of subpopulations
     private Population[] subPopulations;
 
-    /**
-     * Constructor for a population without children (subpopulations). It needs
-     * an age-sex structure, which will also calculate the size
+    /*
+     Constructs a population with the supplied value, from the supplied subpopulations
      */
-    public Population(Time date, Region region, AgeStructure maleStructure, AgeStructure femStructure, int numChildren, Mortality mort, Fertility fert, Migration nonLaborMig, Migration laborMig) {
+    public Population(PopValue v, Population[] subPops) {
+        // Store the value and the array of children
+        this.value = v;
+        this.subPopulations = subPops;
 
-        if (numChildren > 0) {
-            throw new RuntimeException("Tried to create non-Leaf Population with a Leaf Population Constructor. This would compromise integrity of the population size");
-        }
+        // Update the age structures and population sizes appropriately
+        buildAgeStructureFromSubPops();
+    }
+    /*
+     Constructs a leaf population with the supplied value
+     */
 
-        this.date = date;
-        this.region = region;
-        this.maleStructure = maleStructure;
-        this.femStructure = femStructure;
-
-        this.mort = mort;
-        this.fert = fert;
-        this.nonLaborMig = nonLaborMig;
-        this.laborMig = laborMig;
-
-        this.maleSize = maleStructure.sumData();
-        this.femSize = femStructure.sumData();
-        this.totalSize = maleSize + femSize;
+    public Population(PopValue v) {
+        // Store the value and the array of children
+        this.value = v;
     }
 
-    /*
-     Constructor for a population with children (subpopulations). It does not take a size, but calculates it recursively from its subpopulations.
-     */
-    public Population(Time date, Region region, PopulationTreeStructure structure, Mortality mort, Fertility fert, Migration nonLaborMig, Migration laborMig) {
-        this.popStruct = structure;
-        if (structure.numChildren == 0) {
-            throw new RuntimeException("Tried to create a Leaf Population with a non-Leaf Population Constructor. This would compromise integrity of the population size");
+    private void buildAgeStructureFromSubPops() {
+        if (isLeaf()) {
+            throw new RuntimeException("Tried to get an age structure from subpopulations for a leaf population (which does not have subpopulations");
         }
 
-        this.date = date;
-        this.region = region;
+        AgeStructure tempMaleStruct = new AgeStructure(0);
+        AgeStructure tempFemStruct = new AgeStructure(0);
 
-        this.mort = mort;
-        this.fert = fert;
-        this.nonLaborMig = nonLaborMig;
-        this.laborMig = laborMig;
-
-        // The size is simply the sum of the size of the children;
-        int tempMaleSize = 0;
-        int tempFemSize = 0;
         for (Population p : subPopulations) {
-            tempMaleSize += p.maleSize;
-            tempFemSize += p.femSize;
+            tempMaleStruct = tempMaleStruct.add(p.value.getMaleStructure());
+            tempFemStruct = tempFemStruct.add(p.value.getFemStructure());
         }
-        this.maleSize = tempMaleSize;
-        this.femSize = tempFemSize;
-        this.totalSize = maleSize + femSize;
+        value.updateStructure(tempMaleStruct, tempFemStruct);
     }
 
-    /*
-     Construct a population from the subpopulations
-     */
-    public Population(Time date, Region region, Population[] subPopulations) {
-        this.date = date;
-        this.region = region;
-        this.subPopulations = subPopulations;
+    public void setMort(Mortality m) {
+        value.setMort(m);
+    }
 
-        AgeStructure fSt = new AgeStructure(0);
-        AgeStructure mSt = new AgeStructure(0);
-        for (Population p : subPopulations) {
-            fSt = new AgeStructure(fSt.add(p.femStructure).getData());
-            mSt = new AgeStructure(mSt.add(p.maleStructure).getData());
+    public void setFert(Fertility f) {
+        value.setFert(f);
+    }
+
+    public void setNonLaborMig(Migration nlm) {
+        value.setNonLaborMig(nlm);
+    }
+
+    public void setLaborMig(Migration lm) {
+        value.setLaborMig(lm);
+    }
+
+    public void bearSubPopulation(Population p) {
+        Population[] tempSubs = new Population[subPopulations.length + 1];
+        for (int i = 0; i < subPopulations.length; i++) {
+            tempSubs[i] = subPopulations[i];
         }
-
-        this.popStruct = new PopulationTreeStructure();
-
-        this.popStruct = structure;
-
-        this.date = date;
-        this.region = region;
-
-        this.mort = mort;
-        this.fert = fert;
-        this.nonLaborMig = nonLaborMig;
-        this.laborMig = laborMig;
-
-        // The size is simply the sum of the size of the children;
-        int tempMaleSize = 0;
-        int tempFemSize = 0;
-        for (Population p : subPopulations) {
-            tempMaleSize += p.maleSize;
-            tempFemSize += p.femSize;
-        }
-        this.maleSize = tempMaleSize;
-        this.femSize = tempFemSize;
-        this.totalSize = maleSize + femSize;
+        tempSubs[tempSubs.length - 1] = p;
     }
 
     /*
@@ -148,7 +100,7 @@ public class Population {
         
         
      */
-    public Population addPopulation(Population p, Time d, Region g) {
+    /*public Population addPopulation(Population p, Time d, Region g) {
         if (hasSameStructure(p)) {
             throw new RuntimeException("Tried to add two populations with different structures");
         }
@@ -182,7 +134,7 @@ public class Population {
     /*
      Subtracts a population. The population must have the same compositional structure. 
      Details: this is done recursively. Each subpopulation is added
-     */
+     
     public Population substractPopulation(Population p) {
         if (hasSameStructure(p)) {
             throw new RuntimeException("Tried to subtract two populations with different structures");
@@ -197,8 +149,9 @@ public class Population {
      Returns whether there are subpopulations.
      If there are no subpopulations, then it is a "leaf" population
      */
+    
     private boolean isLeaf() {
-        return popStruct.numChildren == 0;
+        return subPopulations == null;
     }
 
     /*
@@ -207,15 +160,11 @@ public class Population {
      age and sex structures for now can be different, but they are currently typed so they must be be male and female with ages 0-101, so not an issue for now
      */
     public boolean hasSameStructure(Population p) {
-        // Check that their compositional signatures are the same;
-        if (!popStruct.equals(p.popStruct)) {
+        // Check they have the same number of children;
+        if (subPopulations.length!=p.subPopulations.length) {
             return false;
         }
-        // If we got to this point, and there are no children, then the populations have the same structure
-        if (isLeaf() && p.isLeaf()) {
-            return true;
-        }
-        // Otherwise, check if the children have the same structure
+        // Otherwise, check if the ordered children have the same structure
         for (int i = 0; i < subPopulations.length; i++) {
             Population p1 = subPopulations[i];
             Population p2 = p.subPopulations[i];
