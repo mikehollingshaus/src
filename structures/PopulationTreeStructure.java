@@ -9,21 +9,18 @@ package structures;
  *
  * @author u0214256
  */
-public class PopulationStructure {
+public class PopulationTreeStructure {
 
-    public final Time time;
-    public final Region region;
-    public final int age;
-    public final boolean isMale;
     public final int numChildren;
     public final boolean birthOrder;
 
-    public PopulationStructure(Time date, Region geography, int age, boolean isMale, int numChildren, boolean birthOrder) {
-        this.time = date;
-        this.region = geography;
-        this.age = age;
-        this.isMale = isMale;
+    public PopulationTreeStructure(int numChildren, boolean birthOrder) {
         this.numChildren = numChildren;
         this.birthOrder = birthOrder;
     }
+    
+    public boolean equals(PopulationTreeStructure pts){
+        return numChildren==pts.numChildren && birthOrder==pts.birthOrder;
+    }
+    
 }

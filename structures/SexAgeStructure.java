@@ -5,6 +5,8 @@
  */
 package structures;
 
+import tools.R;
+
 /**
  *
  * @author u0214256
@@ -17,10 +19,9 @@ public class SexAgeStructure {
     private final Sex male;
     private final Sex female;
 
-    private double data;
-    
-    
-    
+    private double[] maleData;
+    private double[] femaleData;
+
     public SexAgeStructure() {
         int[] tempAgeRanges = new int[NUM_AGES];
         for (int i = 0; i < tempAgeRanges.length; i++) {
@@ -31,14 +32,41 @@ public class SexAgeStructure {
         this.female = Sex.FEMALE;
     }
 
-    public double getData() {
-        return data;
+    public double[] getMaleData() {
+        return maleData;
     }
 
-    public void setData(double data) {
-        this.data = data;
+    public void setMaleData(double[] maleData) {
+        this.maleData = maleData;
     }
-    
-    
 
+    public double[] getFemaleData() {
+        return femaleData;
+    }
+
+    public void setFemaleData(double[] femaleData) {
+        this.femaleData = femaleData;
+    }
+
+    public SexAgeStructure add(SexAgeStructure sas) {
+        SexAgeStructure tempSas = new SexAgeStructure();
+        tempSas.setMaleData(R.sumArrays(maleData, sas.maleData));
+        tempSas.setFemaleData(R.sumArrays(femaleData, sas.femaleData));
+        return tempSas;
+    }
+
+    public SexAgeStructure subtract(SexAgeStructure sas) {
+        SexAgeStructure tempSas = new SexAgeStructure();
+        tempSas.setMaleData(R.differenceArrays(maleData, sas.maleData));
+        tempSas.setFemaleData(R.differenceArrays(femaleData, sas.femaleData));
+        return tempSas;
+    }
+
+   /* public boolean equals(SexAgeStructure sas) {
+        if (maleData.length != sas.maleData.length) {
+            return false;
+        }
+        return true;
+    }
+*/
 }

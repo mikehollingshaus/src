@@ -3,11 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package structures;
+package tools;
 
 import mathematicalAttributes.AgeSpecificNumber;
 import mathematicalAttributes.Ratio;
 import rules.ModelConstraints;
+import structures.DataFrame;
+import structures.Fertility;
+import structures.Migration;
+import structures.Mortality;
+import structures.Population;
 
 /**
  *
