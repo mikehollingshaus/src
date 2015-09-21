@@ -5,43 +5,82 @@
  */
 package tools;
 
-import mathematicalAttributes.AgeSpecificNumber;
-import mathematicalAttributes.Ratio;
+import mathematicalAttributes.NumericObjectVector;
 import rules.ModelConstraints;
-import structures.DataFrame;
+import structures.AgeDistribution;
 import structures.Fertility;
+import structures.Home;
+import structures.Home.HomeType;
 import structures.Migration;
 import structures.Mortality;
+import structures.PopValue;
 import structures.Population;
+import structures.Region;
+import structures.Status;
+import structures.Status.StatusType;
+import structures.Time;
 
 /**
  *
  * @author u0214256
  */
 public class CohortComponentModel {
+
     public static final double SEX_RATIO = 1.05;
     private final ModelConstraints modelConstraints;
     private final DataFrame dataFrame;
-    private final Population basePop;
+//    private final Population pop0;
     private Population allPops;
-    
+
     public CohortComponentModel(ModelConstraints mc, DataFrame datf) {
         this.modelConstraints = mc;
         this.dataFrame = datf;
-
-        getBaseData();
-        createPop0();
-        this.secondarySexRatio = new Ratio(1.05);
     }
 
     public void build1() {
 
-        Population launchPop = basePop;
-        Population mortPop = basePop.applyForce(mortality);
+        // Build up the population;
+        // First, create the necessary age distributions from the data
+        NumericObjectVector maleMortV = (NumericObjectVector) dataFrame.var("t.m.qx");
+        NumericObjectVector femMortV = (NumericObjectVector) dataFrame.var("t.f.qx");
+        NumericObjectVector fertV = (NumericObjectVector) dataFrame.var("asrb");
+        NumericObjectVector maleMigV = (NumericObjectVector) dataFrame.var("t.m.mig");
+        NumericObjectVector femMigV = (NumericObjectVector) dataFrame.var("t.f.mig");
+        NumericObjectVector malePopV = (NumericObjectVector) dataFrame.var("t.m.pop");
+        NumericObjectVector femPopV = (NumericObjectVector) dataFrame.var("t.f.pop");
 
-        System.out.println(dataFrame);
-        System.out.println("END");
+        AgeDistribution maleMort = new AgeDistribution(maleMortV.getValues());
+        AgeDistribution femMort = new AgeDistribution(femMortV.getValues());
+        AgeDistribution fert = new AgeDistribution(fertV.getValues());
+        AgeDistribution maleMig = new AgeDistribution(maleMigV.getValues());
+        AgeDistribution femMig = new AgeDistribution(femMigV.getValues());
+        AgeDistribution malePop = new AgeDistribution(malePopV.getValues());
+        AgeDistribution femPop = new AgeDistribution(femPopV.getValues());
 
+        // Create the population
+        // First, create the population value
+        Population pop2010 = new Population(new PopValue(new Time(2010, 4, 1), new Region("Utah State"), new Status(StatusType.NORMAL_POP), new Home(HomeType.HOUSEHOLD), malePop, femPop));
+
+        // Set the Demographic forces
+        pop2010.setMaleMort(new Mortality(maleMort));
+        pop2010.setFemMort(new Mortality(femMort));
+        pop2010.setFert(new Fertility(fert));
+        // For now, just treat the one migration value as non-labor force migration
+        pop2010.setMaleNonLaborMig(new Migration(maleMig));
+        pop2010.setFemNonLaborMig(new Migration(femMig));
+
+                
+        // Now, run the cohort component model
+        /*        
+         PopValue pv2010Copy = new PopValue(new Time(2010, 4, 1), new Region("Utah State"), new Status(StatusType.NORMAL_POP), new Home(HomeType.HOUSEHOLD), malePop, femPop);
+         Population pop2010Copy = new Population(pv2010Copy);
+         PopValue pvTest = new PopValue(pv2010.getDate(), new Region("Bigger than Utah State"), pv2010.getStatus(), pv2010.getHome());
+         Population[] kidArray = {pop2010, pop2010Copy};
+         Population bigPop = new Population(pvTest, kidArray);
+         */
+        System.out.println("Test");
+
+//public PopValue(Time date, Region region, Status status, Home home, AgeDistribution maleStruct, AgeDistribution femStruct)
         /*        for (int i = 0; i < yearArray.length; i++) {
 
          double launchyear = yearArray[i];
@@ -52,62 +91,4 @@ public class CohortComponentModel {
          */
     }
 
-    private void getBaseData() {
-        NumericObjectVector ageVect = (NumericObjectVector) dataFrame.var("age");
-        this.ages = ageVect.getValues();
-        AgeSpecificNumber[] mortRates = getRatesFromVect((NumericObjectVector) dataFrame.var("t.m.qx"), ages);
-        AgeSpecificNumber[] fertRates = getRatesFromVect((NumericObjectVector) dataFrame.var("asrb"), ages);
-        AgeSpecificNumber[] migRates = getRatesFromVect((NumericObjectVector) dataFrame.var("t.m.mig"), ages);
-        this.mortalityObject = new Mortality(new AgeSchedule(mortRates));
-        this.fertilityObject = new Fertility(new AgeSchedule(fertRates));
-        this.netMigObject = new Migration(new AgeSchedule(migRates));
-    }
-
-    private void createPop0() {
-        AgeSpecificNumber[] agePops = getCountsFromVect((NumericObjectVector) dataFrame.var("t.m.pop"), ages);
-
-        this.basePop = new PointPopulation(new AgeSchedule(agePops), modelConstraints.getBegYear(), 7, 1);
-        this.periodPopPop = new PointPopulation[yearArray.length];
-        periodPopPop[0] = basePop;
-    }
-
-    public AgeSpecificNumber[] getRatesFromVect(NumericObjectVector nv, double[] tage) {
-        AgeSpecificNumber[] temp = new AgeSpecificNumber[nv.getLength()];
-        for (int i = 0; i < temp.length; i++) {
-            temp[i] = new AgeSpecificNumber(nv.getValueAtIndex(i), tage[i]);
-        }
-        return temp;
-    }
-
-    public AgeSpecificNumber[] getCountsFromVect(NumericObjectVector nv, double[] tage) {
-        AgeSpecificNumber[] temp = new AgeSpecificNumber[nv.getLength()];
-        for (int i = 0; i < temp.length; i++) {
-            temp[i] = new AgeSpecificNumber(nv.getValueAtIndex(i), tage[i]);
-        }
-        return temp;
-    }
-
-    public ModelConstraints getModelConstraints() {
-        return modelConstraints;
-    }
-
-    public Fertility getFertilityObject() {
-        return fertilityObject;
-    }
-
-    public Mortality getMortalityObject() {
-        return mortalityObject;
-    }
-
-    public Migration getNetMigObject() {
-        return netMigObject;
-    }
-
-    /*public Migration getNonLaborMigrationObject() {
-     return nonLaborMigrationObject;
-     }
-
-     public Migration getLaborMigrationObject() {
-     return laborMigrationObject;
-     }*/
 }

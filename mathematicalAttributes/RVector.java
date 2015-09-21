@@ -25,9 +25,11 @@ public abstract class RVector {
         this.length = (int) Math.floor(((b - a) / c) + 1);
     }
 
-    public int getLength(){
+    public int getLength() {
         return length;
-    };
+    }
+
+    ;
 
     public abstract String toString();
 

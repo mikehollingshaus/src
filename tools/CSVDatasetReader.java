@@ -14,7 +14,6 @@ import mathematicalAttributes.RVector;
 import mathematicalAttributes.StringVector;
 import mathematicalAttributes.VectorType;
 
-import structures.DataFrame;
 
 /**
  *

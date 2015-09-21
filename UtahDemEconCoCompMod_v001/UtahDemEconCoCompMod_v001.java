@@ -29,7 +29,6 @@ public class UtahDemEconCoCompMod_v001 {
      */
     public static void main(String[] args) {
         UtahDemEconCoCompMod_v001 udem = new UtahDemEconCoCompMod_v001(new Date());
-        System.out.println("Hello World!");
         udem.workbench.buildTheModel();
          
     }

@@ -10,17 +10,17 @@ package structures;
  * @author u0214256
  */
 public abstract class DemographicForce {
-    protected final AgeStructure ageStructure;
+    protected final AgeDistribution ageDistribution;
     
     /*
     Constructs a Demographic Component (mortality, fertility, or migration), from the given age schedule
     */
-    public DemographicForce(AgeStructure sexAgeStructure){
-        this.ageStructure=sexAgeStructure;
+    public DemographicForce(AgeDistribution sexAgeDistribution){
+        this.ageDistribution=sexAgeDistribution;
     }
 
-    public AgeStructure getSexAgeStructure() {
-        return ageStructure;
+    public AgeDistribution getSexAgeDistribution() {
+        return ageDistribution;
     }
        
 }

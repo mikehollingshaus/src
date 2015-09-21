@@ -7,7 +7,7 @@ package UtahDemEconCoCompMod_v001;
 
 import rules.ModelConstraints;
 import tools.CohortComponentModel;
-import structures.DataFrame;
+import tools.DataFrame;
 import tools.CSVDatasetReader;
 import tools.Tester;
 
@@ -33,17 +33,20 @@ public class WorkBench {
      Where the main program is run. This is where the main model building flow is conducted
      */
     public void buildTheModel() {
-        
+
         // build the model here    
         // Read the data file
         DataFrame df1 = new CSVDatasetReader(filePath, true).readDataFrame();
-//        this.model = new CohortComponentModel(modelConstraints, df1);
-//        model.build1();
-        
+        this.model = new CohortComponentModel(modelConstraints, df1);
+        model.build1();
+
         Tester tester = new Tester(this);
-        tester.test();
-      
-           
+//        tester.test();
+
+        
+        
+        System.out.println(df1);
+
     }
 
 }

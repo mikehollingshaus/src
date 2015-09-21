@@ -18,13 +18,13 @@ public class PopValue {
     private final Status status;
     private final Home home;
 
-    private double[] totData;
-    private AgeStructure totSructure, maleStructure, femStructure;
+    private AgeDistribution totDistribution, maleDistribution, femDistribution;
 
-    private Mortality mort;
+    private Mortality maleMort, femMort;
     private Fertility fert;
-    private Migration nonLaborMig, laborMig;
+    private Migration maleNonLaborMig, maleLaborMig, femNonLaborMig, femLaborMig;
 
+    
     public PopValue(Time date, Region region, Status status, Home home) {
         this.date = date;
         this.region = region;
@@ -32,25 +32,25 @@ public class PopValue {
         this.home = home;
     }
 
-    public PopValue(Time date, Region region, Status status, Home home, AgeStructure maleStruct, AgeStructure femStruct) {
+    public PopValue(Time date, Region region, Status status, Home home, AgeDistribution maleStruct, AgeDistribution femStruct) {
         this.date = date;
         this.region = region;
         this.status = status;
         this.home = home;
-        updateStructure(maleStruct, femStruct);
+        updateDistribution(maleStruct, femStruct);
     }
 
-    public void updateStructure(AgeStructure mStruct, AgeStructure fStruct) {
-        maleStructure = mStruct;
-        femStructure = fStruct;
-        totSructure = mStruct.add(fStruct);
+    public void updateDistribution(AgeDistribution mDist, AgeDistribution fDist) {
+        maleDistribution = mDist;
+        femDistribution = fDist;
+        totDistribution = mDist.add(fDist);
         updateSizes();
     }
 
     private void updateSizes() {
-        maleSize = maleStructure.sumData();
-        femSize = femStructure.sumData();
-        totalSize = totSructure.sumData();
+        maleSize = maleDistribution.sumData();
+        femSize = femDistribution.sumData();
+        totalSize = totDistribution.sumData();
     }
 
     public Time getDate() {
@@ -93,44 +93,44 @@ public class PopValue {
         this.maleSize = maleSize;
     }
 
-    public double[] getTotData() {
-        return totData;
+    public AgeDistribution getTotDistribution() {
+        return totDistribution;
     }
 
-    public void setTotData(double[] totData) {
-        this.totData = totData;
+    public void setTotDistribution(AgeDistribution totDistribution) {
+        this.totDistribution = totDistribution;
     }
 
-    public AgeStructure getTotSructure() {
-        return totSructure;
+    public AgeDistribution getMaleDistribution() {
+        return maleDistribution;
     }
 
-    public void setTotSructure(AgeStructure totSructure) {
-        this.totSructure = totSructure;
+    public void setMaleDistribution(AgeDistribution maleDistribution) {
+        this.maleDistribution = maleDistribution;
     }
 
-    public AgeStructure getMaleStructure() {
-        return maleStructure;
+    public AgeDistribution getFemDistribution() {
+        return femDistribution;
     }
 
-    public void setMaleStructure(AgeStructure maleStructure) {
-        this.maleStructure = maleStructure;
+    public void setFemDistribution(AgeDistribution femDistribution) {
+        this.femDistribution = femDistribution;
     }
 
-    public AgeStructure getFemStructure() {
-        return femStructure;
+    public Mortality getMaleMort() {
+        return maleMort;
     }
 
-    public void setFemStructure(AgeStructure femStructure) {
-        this.femStructure = femStructure;
+    public void setMaleMort(Mortality maleMort) {
+        this.maleMort = maleMort;
     }
 
-    public Mortality getMort() {
-        return mort;
+    public Mortality getFemMort() {
+        return femMort;
     }
 
-    public void setMort(Mortality mort) {
-        this.mort = mort;
+    public void setFemMort(Mortality femMort) {
+        this.femMort = femMort;
     }
 
     public Fertility getFert() {
@@ -141,20 +141,36 @@ public class PopValue {
         this.fert = fert;
     }
 
-    public Migration getNonLaborMig() {
-        return nonLaborMig;
+    public Migration getMaleNonLaborMig() {
+        return maleNonLaborMig;
     }
 
-    public void setNonLaborMig(Migration nonLaborMig) {
-        this.nonLaborMig = nonLaborMig;
+    public void setMaleNonLaborMig(Migration maleNonLaborMig) {
+        this.maleNonLaborMig = maleNonLaborMig;
     }
 
-    public Migration getLaborMig() {
-        return laborMig;
+    public Migration getMaleLaborMig() {
+        return maleLaborMig;
     }
 
-    public void setLaborMig(Migration laborMig) {
-        this.laborMig = laborMig;
+    public void setMaleLaborMig(Migration maleLaborMig) {
+        this.maleLaborMig = maleLaborMig;
+    }
+
+    public Migration getFemNonLaborMig() {
+        return femNonLaborMig;
+    }
+
+    public void setFemNonLaborMig(Migration femNonLaborMig) {
+        this.femNonLaborMig = femNonLaborMig;
+    }
+
+    public Migration getFemLaborMig() {
+        return femLaborMig;
+    }
+
+    public void setFemLaborMig(Migration femLaborMig) {
+        this.femLaborMig = femLaborMig;
     }
 
 }

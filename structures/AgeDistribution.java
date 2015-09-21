@@ -11,14 +11,14 @@ import tools.R;
  *
  * @author u0214256
  */
-public class AgeStructure {
+public class AgeDistribution {
 
     public static final int NUM_AGES = 101;
 
     private final int[] ageRanges;
     private final double[] data;
 
-    public AgeStructure(double[] data) {
+    public AgeDistribution(double[] data) {
         int[] tempAgeRanges = new int[NUM_AGES];
         for (int i = 0; i < tempAgeRanges.length; i++) {
             tempAgeRanges[i] = i;
@@ -27,7 +27,7 @@ public class AgeStructure {
         this.data = data;
     }
     
-    public AgeStructure(double dat) {
+    public AgeDistribution(double dat) {
         int[] tempAgeRanges = new int[NUM_AGES];
         double[] tempData = new double[NUM_AGES];
         for (int i = 0; i < tempAgeRanges.length; i++) {
@@ -42,14 +42,14 @@ public class AgeStructure {
         return data;
     }
  
-    public AgeStructure add(AgeStructure sas) {
+    public AgeDistribution add(AgeDistribution sas) {
         double[] sumDat = R.sumArrays(data, sas.data);
-        return new AgeStructure(sumDat);
+        return new AgeDistribution(sumDat);
     }
 
-    public AgeStructure subtract(AgeStructure sas) {
+    public AgeDistribution subtract(AgeDistribution sas) {
         double[] sumDat = R.differenceArrays(data, sas.data);
-        return new AgeStructure(sumDat);
+        return new AgeDistribution(sumDat);
     }
     
     public double sumData(){
@@ -60,7 +60,7 @@ public class AgeStructure {
         return sum;
     }
 
-    /* public boolean equals(AgeStructure sas) {
+    /* public boolean equals(AgeDistribution sas) {
      if (maleData.length != sas.maleData.length) {
      return false;
      }

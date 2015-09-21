@@ -30,7 +30,7 @@ public class Population {
         this.subPopulations = subPops;
 
         // Update the age structures and population sizes appropriately
-        buildAgeStructureFromSubPops();
+        buildAgeDistributionFromSubPops();
     }
     /*
      Constructs a leaf population with the supplied value
@@ -41,35 +41,47 @@ public class Population {
         this.value = v;
     }
 
-    private void buildAgeStructureFromSubPops() {
+    private void buildAgeDistributionFromSubPops() {
         if (isLeaf()) {
-            throw new RuntimeException("Tried to get an age structure from subpopulations for a leaf population (which does not have subpopulations");
+            throw new RuntimeException("Tried to get an age distribution from subpopulations for a leaf population (which does not have subpopulations");
         }
 
-        AgeStructure tempMaleStruct = new AgeStructure(0);
-        AgeStructure tempFemStruct = new AgeStructure(0);
+        AgeDistribution tempMaleDist = new AgeDistribution(0);
+        AgeDistribution tempFemDist = new AgeDistribution(0);
 
         for (Population p : subPopulations) {
-            tempMaleStruct = tempMaleStruct.add(p.value.getMaleStructure());
-            tempFemStruct = tempFemStruct.add(p.value.getFemStructure());
+            tempMaleDist = tempMaleDist.add(p.value.getMaleDistribution());
+            tempFemDist = tempFemDist.add(p.value.getFemDistribution());
         }
-        value.updateStructure(tempMaleStruct, tempFemStruct);
+        value.updateDistribution(tempMaleDist, tempFemDist);
     }
 
-    public void setMort(Mortality m) {
-        value.setMort(m);
+    public void setMaleMort(Mortality m) {
+        value.setMaleMort(m);
     }
 
+    public void setFemMort(Mortality m) {
+        value.setFemMort(m);
+    }
+    
     public void setFert(Fertility f) {
         value.setFert(f);
     }
 
-    public void setNonLaborMig(Migration nlm) {
-        value.setNonLaborMig(nlm);
+    public void setMaleNonLaborMig(Migration nlm) {
+        value.setMaleNonLaborMig(nlm);
+    }
+    
+    public void setFemNonLaborMig(Migration nlm) {
+        value.setFemNonLaborMig(nlm);
     }
 
-    public void setLaborMig(Migration lm) {
-        value.setLaborMig(lm);
+    public void setMaleLaborMig(Migration lm) {
+        value.setMaleLaborMig(lm);
+    }
+    
+    public void setFemLaborMig(Migration lm) {
+        value.setFemLaborMig(lm);
     }
 
     public void bearSubPopulation(Population p) {
@@ -79,20 +91,7 @@ public class Population {
         }
         tempSubs[tempSubs.length - 1] = p;
     }
-
-    /*
-     To simplify, cannot include age structures by sex, and overall.
-     So, if tot is null, male and female cannot be.
-     And, if male or female is null, tot cannot be
-     */
-    /*
-     private void validateStructures(AgeStructure tot, AgeStructure m, AgeStructure f){
-     if (tot==null && (m==null || f==null)){
-     throw new RuntimeException("Tried to ")
-     }
-            
-     }
-     */
+    
     /*
      Adds a population, returning a new population with the same structure, Time d, Region d, and given mortality, fertility, and migration forces. The population must have the same compositional structure. 
      Details: Populations are added by summing the male and female age structures.
@@ -106,18 +105,18 @@ public class Population {
         }
         // If this is a leaf population, then return a new population that adds the two sizes;
         Population totPop;
-        AgeStructure amale, afemale;
+        AgeDistribution amale, afemale;
 
         if (isLeaf()) {
-            amale = new AgeStructure(maleStructure.add(p.maleStructure).getData());
-            afemale = new AgeStructure(femStructure.add(p.femStructure).getData());
+            amale = new AgeDistribution(maleStructure.add(p.maleStructure).getData());
+            afemale = new AgeDistribution(femStructure.add(p.femStructure).getData());
             totPop = new Population(d, g, amale, afemale, popStruct, mort, fert, nonLaborMig, laborMig);
             return totPop;
         }
 
         // Otherwise, return a new population that is the sum of the subpopulations
-        amale = new AgeStructure(maleStructure.getData());
-        afemale = new AgeStructure(femStructure.getData());
+        amale = new AgeDistribution(maleStructure.getData());
+        afemale = new AgeDistribution(femStructure.getData());
 
         Population[] tempSubPops = new Population[subPopulations.length];
 
