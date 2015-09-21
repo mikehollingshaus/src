@@ -12,15 +12,14 @@ package structures;
 public class PopulationTreeStructure {
 
     public final int numChildren;
-    public final boolean birthOrder;
 
-    public PopulationTreeStructure(int numChildren, boolean birthOrder) {
+    public PopulationTreeStructure(int numChildren) {
         this.numChildren = numChildren;
-        this.birthOrder = birthOrder;
+
     }
-    
-    public boolean equals(PopulationTreeStructure pts){
-        return numChildren==pts.numChildren && birthOrder==pts.birthOrder;
+
+    public boolean equals(PopulationTreeStructure pts) {
+        return numChildren == pts.numChildren;
     }
-    
+
 }

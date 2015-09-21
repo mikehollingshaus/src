@@ -11,8 +11,8 @@ package structures;
  */
 public class Mortality extends DemographicForce {
 
-    public Mortality(SexAgeStructure sexAgeStructure) {
-        super(sexAgeStructure);
+    public Mortality(AgeStructure ageStructure) {
+        super(ageStructure);
     }
     
 }
