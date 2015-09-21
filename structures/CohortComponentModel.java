@@ -6,8 +6,6 @@
 package structures;
 
 import mathematicalAttributes.AgeSpecificNumber;
-import mathematicalAttributes.NumericObject;
-import mathematicalAttributes.NumericObjectVector;
 import mathematicalAttributes.Ratio;
 import rules.ModelConstraints;
 
@@ -16,36 +14,25 @@ import rules.ModelConstraints;
  * @author u0214256
  */
 public class CohortComponentModel {
-
-    private ModelConstraints modelConstraints;
-    private DataFrame dataFrame;
-
-    private Fertility fertilityObject;
-    private Mortality mortalityObject;
-//    Migration nonLaborMigrationObject, laborMigrationObject;
-    private Migration netMigObject;
-    private PointPopulation basePop;
-    private Ratio secondarySexRatio;
-
-    public double[] ages;
-
-    private double[] yearArray;
-
-    private PointPopulation[] periodPopPop;
-
+    public static final double SEX_RATIO = 1.05;
+    private final ModelConstraints modelConstraints;
+    private final DataFrame dataFrame;
+    private final Population basePop;
+    private Population allPops;
+    
     public CohortComponentModel(ModelConstraints mc, DataFrame datf) {
         this.modelConstraints = mc;
         this.dataFrame = datf;
-        this.yearArray = new NumericObjectVector(new NumericObject(modelConstraints.getBegYear(), false), new NumericObject(modelConstraints.getEndYear(), false), new NumericObject(1, false)).getValues();
-        createComponents();
+
+        getBaseData();
         createPop0();
         this.secondarySexRatio = new Ratio(1.05);
     }
 
     public void build1() {
 
-        PointPopulation launchPop = basePop;
-        PointPopulation postMort = basePop.applyAgeMortalitySchedule(mortalityObject);
+        Population launchPop = basePop;
+        Population mortPop = basePop.applyForce(mortality);
 
         System.out.println(dataFrame);
         System.out.println("END");
@@ -60,7 +47,7 @@ public class CohortComponentModel {
          */
     }
 
-    private void createComponents() {
+    private void getBaseData() {
         NumericObjectVector ageVect = (NumericObjectVector) dataFrame.var("age");
         this.ages = ageVect.getValues();
         AgeSpecificNumber[] mortRates = getRatesFromVect((NumericObjectVector) dataFrame.var("t.m.qx"), ages);

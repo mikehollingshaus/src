@@ -9,6 +9,7 @@ import rules.ModelConstraints;
 import structures.CohortComponentModel;
 import structures.DataFrame;
 import tools.CSVDatasetReader;
+import tools.Tester;
 
 /**
  *
@@ -36,9 +37,11 @@ public class WorkBench {
         // build the model here    
         // Read the data file
         DataFrame df1 = new CSVDatasetReader(filePath, true).readDataFrame();
-        this.model = new CohortComponentModel(modelConstraints, df1);
-        model.build1();
+//        this.model = new CohortComponentModel(modelConstraints, df1);
+//        model.build1();
         
+        Tester tester = new Tester(this);
+        tester.test();
       
            
     }
