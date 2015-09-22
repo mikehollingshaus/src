@@ -6,6 +6,7 @@
 package structures;
 
 import structures.DemographicForce.DemographicForceType;
+import tools.CohortComponentModel;
 
 /**
  *
@@ -73,10 +74,11 @@ public class Population {
     public void setMaleMig(Migration mig) {
         value.setMaleMig(mig);
     }
-    
+
     public void setFemMig(Migration mig) {
         value.setFemMig(mig);
     }
+
     public void bearSubPopulation(Population p) {
         Population[] tempSubs = new Population[subPopulations.length + 1];
         for (int i = 0; i < subPopulations.length; i++) {
@@ -91,10 +93,10 @@ public class Population {
      Note, if this is not a leaf population, then its the sum of the children components (recursive)
      */
     public Population addPopulation(Population p) {
-        if (hasSameStructure(p)) {
+        if (!hasSameStructure(p)) {
             throw new RuntimeException("Tried to add two populations with different structures");
         }
-        PopValue pv;
+        PopValue pv = value.twin();
         // If this is a leaf population, then return a new population that adds the two sizes;
         AgeDistribution amale, afem;
         if (isLeaf()) {
@@ -102,7 +104,7 @@ public class Population {
             afem = new AgeDistribution(value.getFemDistribution().add(p.value.getFemDistribution()));
 
             // Set the popvalue, with default demographic forces being from this object (not the one passed along in the parameter)
-            pv = new PopValue(value.getDate(), value.getRegion(), value.getStatus(), value.getHome(), amale, afem);
+            pv.updateDistribution(amale, afem);
             pv.setDefaultDemForces(this);
 
             return new Population(pv);
@@ -110,35 +112,82 @@ public class Population {
         // Otherwise, return a new population that is the sum of the subpopulations
 
         // First, create a new popvalue
-        pv = value.twin();
         pv.setDefaultDemForces(this);
 
         Population[] newSubPops = new Population[subPopulations.length];
-
         // add each subpopulation
         for (int i = 0; i < subPopulations.length; i++) {
             newSubPops[i] = subPopulations[i].addPopulation(p);
         }
-
         // Pass along the subpopulations
         return new Population(pv, newSubPops);
     }
 
     /*
-     Subtracts a population. The population must have the same compositional structure. 
-     Details: this is done recursively. Each subpopulation is added
-     
-     public Population substractPopulation(Population p) {
-     if (hasSameStructure(p)) {
-     throw new RuntimeException("Tried to subtract two populations with different structures");
-     }
-     return null;
-     }
+     Subtracts a population, returning a new population with the same structure, Time d, Region d, and given mortality, fertility, and migration forces. The population must have the same compositional structure. 
+     Details: Populations are added by summing the male and female age structures.
+     Note, if this is not a leaf population, then its the sum of the children components (recursive)
+     */
+    public Population subtractPopulation(Population p) {
+        if (!hasSameStructure(p)) {
+            throw new RuntimeException("Tried to subtract two populations with different structures");
+        }
+        PopValue pv = value.twin();
+        // If this is a leaf population, then return a new population that subtracts the two sizes;
+        AgeDistribution amale, afem;
+        if (isLeaf()) {
+            amale = new AgeDistribution(value.getMaleDistribution().subtract(p.value.getMaleDistribution()));
+            afem = new AgeDistribution(value.getFemDistribution().subtract(p.value.getFemDistribution()));
 
-     /*
+            // Set the popvalue, with default demographic forces being from this object (not the one passed along in the parameter)
+            pv.updateDistribution(amale, afem);
+            pv.setDefaultDemForces(this);
+
+            return new Population(pv);
+        }
+        // Otherwise, return a new population that is the sum of the subpopulations
+
+        // First, create a new popvalue
+        pv.setDefaultDemForces(this);
+
+        Population[] newSubPops = new Population[subPopulations.length];
+        // add each subpopulation
+        for (int i = 0; i < subPopulations.length; i++) {
+            newSubPops[i] = subPopulations[i].subtractPopulation(p);
+        }
+        // Pass along the subpopulations
+        return new Population(pv, newSubPops);
+    }
+    /*
      Returns whether there are subpopulations.
      If there are no subpopulations, then it is a "leaf" population
      */
+
+    /*
+     Multiplies a population by a constant. This is important when, 
+     for example, wishing to subtract half the population of deaths before applying birth rates
+     */
+    public Population multiplyByConstant(double val) {
+        PopValue pv = value.twin();
+        AgeDistribution amale, afem;
+        if (isLeaf()) {
+            amale = new AgeDistribution(value.getMaleDistribution().multiply(new AgeDistribution(val)));
+            afem = new AgeDistribution(value.getFemDistribution().multiply(new AgeDistribution(val)));
+            // Set the popvalue, with default demographic forces being from this object (not the one passed along in the parameter)
+            pv.updateDistribution(amale, afem);
+            pv.setDefaultDemForces(this);
+            return new Population(pv);
+        }
+        pv.setDefaultDemForces(this);
+        Population[] newSubPops = new Population[subPopulations.length];
+        // add each subpopulation
+        for (int i = 0; i < subPopulations.length; i++) {
+            newSubPops[i] = subPopulations[i].multiplyByConstant(val);
+        }
+        // Pass along the subpopulations
+        return new Population(pv, newSubPops);
+    }
+
     private boolean isLeaf() {
         return subPopulations == null;
     }
@@ -150,7 +199,15 @@ public class Population {
      */
     public boolean hasSameStructure(Population p) {
         // Check they have the same number of children;
-        if (subPopulations.length != p.subPopulations.length) {
+        // If they are both leafs, then they do
+        if (isLeaf() && p.isLeaf()) {
+            return true;
+        }
+        // if they were not both leafs, but one alone is, then they do not have the same number of children 
+        if (isLeaf() || p.isLeaf()) {
+            return false;
+        } // If neither was a leaf, then check they have the same number of children
+        else if (subPopulations.length != p.subPopulations.length) {
             return false;
         }
         // Otherwise, check if the ordered children have the same structure
@@ -187,39 +244,102 @@ public class Population {
 
         // if it's a leaf node, simply apply a new population that is the multiplication of the force by this pop
         if (isLeaf()) {
+            Population p = new Population(value.twin());
+            AgeDistribution newMalePop;
+            AgeDistribution newFemPop;
+            // multiply the male mortality schedule or migration schedule by the male and female populations
             switch (dft) {
+
                 case MORTALITY:
-                    // multiply the male mortality schedule by the male population
-                    Population p = new Population(value.twin());
-                    AgeDistribution newMalePop = value.getMaleDistribution().multiply(value.getMaleMort().ageDistribution);
-                    AgeDistribution newFemPop = value.getFemDistribution().multiply(value.getFemMort().ageDistribution);
+                    newMalePop = value.getMaleDistribution().multiply(value.getMaleMort().ageDistribution);
+                    newFemPop = value.getFemDistribution().multiply(value.getFemMort().ageDistribution);
                     p.value.updateDistribution(newMalePop, newFemPop);
                     return p;
                 case FERTILITY:
-                    return null;
+                    // Fertility is a special case. Multiply the fertility schedule by the female distribution
+                    AgeDistribution births = value.getFemDistribution().multiply(value.getFert().ageDistribution);
+                    // The proportion that will be male is this function of the Secondary sex ratio
+                    double propMale = CohortComponentModel.SEX_RATIO / (1 + CohortComponentModel.SEX_RATIO);
+                    // Now, get the distribution (by age of mother) of the new male and female births
+                    newMalePop = births.multiply(new AgeDistribution(propMale));
+                    newFemPop = births.subtract(newMalePop);
+                    p.value.updateDistribution(newMalePop, newFemPop);
+                    return p;
                 case MIGRATION:
-                    return null;
+                    newMalePop = value.getMaleDistribution().multiply(value.getMaleMig().ageDistribution);
+                    newFemPop = value.getFemDistribution().multiply(value.getFemMig().ageDistribution);
+                    p.value.updateDistribution(newMalePop, newFemPop);
+                    return p;
             }
         } else {
             // not a leaf
+            // apply the force for the subchildren
+            Population[] newSubPops = new Population[subPopulations.length];
             switch (dft) {
                 case MORTALITY:
-                    Population[] newSubPops = new Population[subPopulations.length];
-
-                    // apply the force for the subchildren
                     for (int i = 0; i < subPopulations.length; i++) {
                         newSubPops[i] = subPopulations[i].applyForce(DemographicForceType.MORTALITY);
                     }
-
-                return new Population(value.twin(),newSubPops);
-                
+                    return new Population(value.twin(), newSubPops);
                 case FERTILITY:
-                    return null;
+                    for (int i = 0; i < subPopulations.length; i++) {
+                        newSubPops[i] = subPopulations[i].applyForce(DemographicForceType.FERTILITY);
+                    }
+                    return new Population(value.twin(), newSubPops);
                 case MIGRATION:
-                    return null;
+                    for (int i = 0; i < subPopulations.length; i++) {
+                        newSubPops[i] = subPopulations[i].applyForce(DemographicForceType.MIGRATION);
+                    }
+                    return new Population(value.twin(), newSubPops);
             }
         }
         return null;
     }
 
+    /*
+     This takes a population, and a population of births, and "ages" it. They must have the same structure
+     The returned population is the target population.
+     For each sex, age 0 is the total number of births, age 100 (which is 100+) is the old age 99 + 100
+     And, ages 1-99 are the old ages 0-98
+     */
+    public Population agePop(Population births, int months) {
+        if (!hasSameStructure(births)) {
+            throw new RuntimeException("Tried to age a population with births of a different structure");
+        }
+        PopValue pv = new PopValue(new Time(value.getDate(), 12), value.getRegion(), value.getStatus(), value.getHome());
+
+        AgeDistribution amale, afem;
+        if (isLeaf()) {
+            double[] oldMale = value.getMaleDistribution().getData();
+            double[] oldFem = value.getFemDistribution().getData();
+            int topAge = AgeDistribution.NUM_AGES - 1;
+            double[] maleVal = new double[topAge + 1];
+            double[] femVal = new double[topAge + 1];
+            maleVal[0] = births.value.getMaleSize();
+            femVal[0] = births.value.getFemSize();
+            maleVal[topAge] = oldMale[topAge] + oldMale[topAge - 1];
+            femVal[topAge] = oldFem[topAge] + oldFem[topAge - 1];
+            for (int i = 1; i < topAge; i++) {
+                maleVal[i] = oldMale[i - 1];
+                femVal[i] = oldFem[i - 1];
+            }
+
+            amale = new AgeDistribution(maleVal);
+            afem = new AgeDistribution(femVal);
+
+            // Set the popvalue, with default demographic forces being from this object (not the one passed along in the parameter)
+            pv.updateDistribution(amale, afem);
+            pv.setDefaultDemForces(this);
+
+            return new Population(pv);
+        }
+        pv.setDefaultDemForces(this);
+        Population[] newSubPops = new Population[subPopulations.length];
+        // add each subpopulation
+        for (int i = 0; i < subPopulations.length; i++) {
+            newSubPops[i] = subPopulations[i].agePop(births.subPopulations[i], months);
+        }
+        // Pass along the subpopulations
+        return new Population(pv, newSubPops);
+    }
 }

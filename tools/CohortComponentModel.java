@@ -66,15 +66,24 @@ public class CohortComponentModel {
         pop2010.setMaleMort(new Mortality(maleMort));
         pop2010.setFemMort(new Mortality(femMort));
         pop2010.setFert(new Fertility(fert));
-        // For now, just treat the one migration value as non-labor force migration
+        // For now, just use the one migration value
         pop2010.setMaleMig(new Migration(maleMig));
         pop2010.setFemMig(new Migration(femMig));
 
+        
         Population deaths = pop2010.applyForce(DemographicForceType.MORTALITY);
+        Population postMort = pop2010.subtractPopulation(deaths);
+        Population migrants = postMort.applyForce(DemographicForceType.MIGRATION);
+        Population postMig = postMort.addPopulation(migrants);
+        Population halfDeaths = deaths.multiplyByConstant(0.5);
+        Population fertPop = postMig.addPopulation(halfDeaths);
+        Population births = fertPop.applyForce(DemographicForceType.FERTILITY);
+        
+        Population targetPop = postMig.agePop(births, 12);
+        
+        Population changePop = targetPop.subtractPopulation(pop2010);
         
         
-        
-                
         // Now, run the cohort component model
         /*        
          PopValue pv2010Copy = new PopValue(new Time(2010, 4, 1), new Region("Utah State"), new Status(StatusType.NORMAL_POP), new Home(HomeType.HOUSEHOLD), malePop, femPop);
@@ -95,5 +104,7 @@ public class CohortComponentModel {
          }
          */
     }
+    
+        
 
 }
