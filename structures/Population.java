@@ -5,6 +5,8 @@
  */
 package structures;
 
+import structures.DemographicForce.DemographicForceType;
+
 /**
  *
  * @author Mike Hollingshaus The population, as a data structure, may be
@@ -63,27 +65,18 @@ public class Population {
     public void setFemMort(Mortality m) {
         value.setFemMort(m);
     }
-    
+
     public void setFert(Fertility f) {
         value.setFert(f);
     }
 
-    public void setMaleNonLaborMig(Migration nlm) {
-        value.setMaleNonLaborMig(nlm);
+    public void setMaleMig(Migration mig) {
+        value.setMaleMig(mig);
     }
     
-    public void setFemNonLaborMig(Migration nlm) {
-        value.setFemNonLaborMig(nlm);
+    public void setFemMig(Migration mig) {
+        value.setFemMig(mig);
     }
-
-    public void setMaleLaborMig(Migration lm) {
-        value.setMaleLaborMig(lm);
-    }
-    
-    public void setFemLaborMig(Migration lm) {
-        value.setFemLaborMig(lm);
-    }
-
     public void bearSubPopulation(Population p) {
         Population[] tempSubs = new Population[subPopulations.length + 1];
         for (int i = 0; i < subPopulations.length; i++) {
@@ -91,64 +84,61 @@ public class Population {
         }
         tempSubs[tempSubs.length - 1] = p;
     }
-    
+
     /*
      Adds a population, returning a new population with the same structure, Time d, Region d, and given mortality, fertility, and migration forces. The population must have the same compositional structure. 
      Details: Populations are added by summing the male and female age structures.
      Note, if this is not a leaf population, then its the sum of the children components (recursive)
-        
-        
      */
-    /*public Population addPopulation(Population p, Time d, Region g) {
+    public Population addPopulation(Population p) {
         if (hasSameStructure(p)) {
             throw new RuntimeException("Tried to add two populations with different structures");
         }
+        PopValue pv;
         // If this is a leaf population, then return a new population that adds the two sizes;
-        Population totPop;
-        AgeDistribution amale, afemale;
-
+        AgeDistribution amale, afem;
         if (isLeaf()) {
-            amale = new AgeDistribution(maleStructure.add(p.maleStructure).getData());
-            afemale = new AgeDistribution(femStructure.add(p.femStructure).getData());
-            totPop = new Population(d, g, amale, afemale, popStruct, mort, fert, nonLaborMig, laborMig);
-            return totPop;
-        }
+            amale = new AgeDistribution(value.getMaleDistribution().add(p.value.getMaleDistribution()));
+            afem = new AgeDistribution(value.getFemDistribution().add(p.value.getFemDistribution()));
 
+            // Set the popvalue, with default demographic forces being from this object (not the one passed along in the parameter)
+            pv = new PopValue(value.getDate(), value.getRegion(), value.getStatus(), value.getHome(), amale, afem);
+            pv.setDefaultDemForces(this);
+
+            return new Population(pv);
+        }
         // Otherwise, return a new population that is the sum of the subpopulations
-        amale = new AgeDistribution(maleStructure.getData());
-        afemale = new AgeDistribution(femStructure.getData());
 
-        Population[] tempSubPops = new Population[subPopulations.length];
+        // First, create a new popvalue
+        pv = value.twin();
+        pv.setDefaultDemForces(this);
 
+        Population[] newSubPops = new Population[subPopulations.length];
+
+        // add each subpopulation
         for (int i = 0; i < subPopulations.length; i++) {
-            Population p1 = subPopulations[i];
-            Population p2 = p.subPopulations[i];
-            tempSubPops[i] = p1.addPopulation(p2, d, g);
-
+            newSubPops[i] = subPopulations[i].addPopulation(p);
         }
 
-        return new Population(d, g, amale, afemale, popStruct, mort, fert, nonLaborMig, laborMig);
+        // Pass along the subpopulations
+        return new Population(pv, newSubPops);
     }
 
     /*
      Subtracts a population. The population must have the same compositional structure. 
      Details: this is done recursively. Each subpopulation is added
      
-    public Population substractPopulation(Population p) {
-        if (hasSameStructure(p)) {
-            throw new RuntimeException("Tried to subtract two populations with different structures");
-        }
-        return null;
-    }
+     public Population substractPopulation(Population p) {
+     if (hasSameStructure(p)) {
+     throw new RuntimeException("Tried to subtract two populations with different structures");
+     }
+     return null;
+     }
 
-    public void applyForce(DemographicForce f) {
-    }
-
-    /*
+     /*
      Returns whether there are subpopulations.
      If there are no subpopulations, then it is a "leaf" population
      */
-    
     private boolean isLeaf() {
         return subPopulations == null;
     }
@@ -160,7 +150,7 @@ public class Population {
      */
     public boolean hasSameStructure(Population p) {
         // Check they have the same number of children;
-        if (subPopulations.length!=p.subPopulations.length) {
+        if (subPopulations.length != p.subPopulations.length) {
             return false;
         }
         // Otherwise, check if the ordered children have the same structure
@@ -174,4 +164,62 @@ public class Population {
         // If we passed all these tests, then the populations have the same structure;
         return true;
     }
+
+    public Population twin() {
+        PopValue pv = value.twin();
+        if (isLeaf()) {
+            return new Population(pv);
+        }
+        Population[] tempSubPops = new Population[subPopulations.length];
+
+        for (int i = 0; i < subPopulations.length; i++) {
+            tempSubPops[i] = subPopulations[i].twin();
+        }
+        return new Population(pv, tempSubPops);
+    }
+
+    public PopValue getPopValue() {
+        return value;
+    }
+
+    public Population applyForce(DemographicForceType dft) {
+        // If it's a leaf node, apply the force
+
+        // if it's a leaf node, simply apply a new population that is the multiplication of the force by this pop
+        if (isLeaf()) {
+            switch (dft) {
+                case MORTALITY:
+                    // multiply the male mortality schedule by the male population
+                    Population p = new Population(value.twin());
+                    AgeDistribution newMalePop = value.getMaleDistribution().multiply(value.getMaleMort().ageDistribution);
+                    AgeDistribution newFemPop = value.getFemDistribution().multiply(value.getFemMort().ageDistribution);
+                    p.value.updateDistribution(newMalePop, newFemPop);
+                    return p;
+                case FERTILITY:
+                    return null;
+                case MIGRATION:
+                    return null;
+            }
+        } else {
+            // not a leaf
+            switch (dft) {
+                case MORTALITY:
+                    Population[] newSubPops = new Population[subPopulations.length];
+
+                    // apply the force for the subchildren
+                    for (int i = 0; i < subPopulations.length; i++) {
+                        newSubPops[i] = subPopulations[i].applyForce(DemographicForceType.MORTALITY);
+                    }
+
+                return new Population(value.twin(),newSubPops);
+                
+                case FERTILITY:
+                    return null;
+                case MIGRATION:
+                    return null;
+            }
+        }
+        return null;
+    }
+
 }

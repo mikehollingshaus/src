@@ -12,6 +12,10 @@ package structures;
 public class Migration extends DemographicForce {
 
     public Migration(AgeDistribution ageDistribution) {
-        super(ageDistribution);
+        super(ageDistribution, DemographicForceType.MIGRATION);
+    }
+
+    public Migration(Migration m) {
+        super(m, DemographicForceType.MIGRATION);
     }
 }

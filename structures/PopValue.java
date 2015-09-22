@@ -18,13 +18,12 @@ public class PopValue {
     private final Status status;
     private final Home home;
 
+    // Note that these are not final.
     private AgeDistribution totDistribution, maleDistribution, femDistribution;
-
     private Mortality maleMort, femMort;
     private Fertility fert;
-    private Migration maleNonLaborMig, maleLaborMig, femNonLaborMig, femLaborMig;
+    private Migration maleMig, femMig;
 
-    
     public PopValue(Time date, Region region, Status status, Home home) {
         this.date = date;
         this.region = region;
@@ -37,6 +36,19 @@ public class PopValue {
         this.region = region;
         this.status = status;
         this.home = home;
+        updateDistribution(maleStruct, femStruct);
+    }
+
+    public PopValue(Time date, Region region, Status status, Home home, AgeDistribution maleStruct, AgeDistribution femStruct, Mortality maleMort, Mortality femMort, Fertility fert, Migration maleMig, Migration femMig) {
+        this.date = date;
+        this.region = region;
+        this.status = status;
+        this.home = home;
+        this.maleMort = maleMort;
+        this.femMort = femMort;
+        this.fert = fert;
+        this.maleMig = maleMig;
+        this.femMig = femMig;
         updateDistribution(maleStruct, femStruct);
     }
 
@@ -141,36 +153,38 @@ public class PopValue {
         this.fert = fert;
     }
 
-    public Migration getMaleNonLaborMig() {
-        return maleNonLaborMig;
+    public Migration getMaleMig() {
+        return maleMig;
     }
 
-    public void setMaleNonLaborMig(Migration maleNonLaborMig) {
-        this.maleNonLaborMig = maleNonLaborMig;
+    public void setMaleMig(Migration maleMig) {
+        this.maleMig = maleMig;
     }
 
-    public Migration getMaleLaborMig() {
-        return maleLaborMig;
+    public Migration getFemMig() {
+        return femMig;
     }
 
-    public void setMaleLaborMig(Migration maleLaborMig) {
-        this.maleLaborMig = maleLaborMig;
+    public void setFemMig(Migration femMig) {
+        this.femMig = femMig;
     }
 
-    public Migration getFemNonLaborMig() {
-        return femNonLaborMig;
+    /*
+     Sets the mort, fert, and mig demographic forces with values from another population
+     */
+    public void setDefaultDemForces(Population p) {
+        maleMort = p.value.maleMort;
+        femMort = p.value.femMort;
+        fert = p.value.fert;
+        this.maleMig = p.value.maleMig;
+        this.femMig = p.value.femMig;
     }
 
-    public void setFemNonLaborMig(Migration femNonLaborMig) {
-        this.femNonLaborMig = femNonLaborMig;
-    }
-
-    public Migration getFemLaborMig() {
-        return femLaborMig;
-    }
-
-    public void setFemLaborMig(Migration femLaborMig) {
-        this.femLaborMig = femLaborMig;
+    /*
+     Note that since the date, region, status and home are immutable, I do not need to copy them.
+     */
+    public PopValue twin() {
+        return new PopValue(date, region, status, home, new AgeDistribution(maleDistribution), new AgeDistribution(femDistribution), new Mortality(maleMort), new Mortality(femMort), new Fertility(fert), new Migration(maleMig), new Migration(femMig));
     }
 
 }

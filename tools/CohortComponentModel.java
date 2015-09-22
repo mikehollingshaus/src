@@ -8,6 +8,7 @@ package tools;
 import mathematicalAttributes.NumericObjectVector;
 import rules.ModelConstraints;
 import structures.AgeDistribution;
+import structures.DemographicForce.DemographicForceType;
 import structures.Fertility;
 import structures.Home;
 import structures.Home.HomeType;
@@ -66,9 +67,13 @@ public class CohortComponentModel {
         pop2010.setFemMort(new Mortality(femMort));
         pop2010.setFert(new Fertility(fert));
         // For now, just treat the one migration value as non-labor force migration
-        pop2010.setMaleNonLaborMig(new Migration(maleMig));
-        pop2010.setFemNonLaborMig(new Migration(femMig));
+        pop2010.setMaleMig(new Migration(maleMig));
+        pop2010.setFemMig(new Migration(femMig));
 
+        Population deaths = pop2010.applyForce(DemographicForceType.MORTALITY);
+        
+        
+        
                 
         // Now, run the cohort component model
         /*        

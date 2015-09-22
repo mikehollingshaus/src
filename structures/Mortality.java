@@ -12,7 +12,10 @@ package structures;
 public class Mortality extends DemographicForce {
 
     public Mortality(AgeDistribution ageDistribution) {
-        super(ageDistribution);
+        super(ageDistribution, DemographicForceType.MORTALITY);
     }
     
+    public Mortality(Mortality m){
+        super(m, DemographicForceType.MORTALITY);
+    }
 }

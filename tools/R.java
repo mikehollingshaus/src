@@ -18,8 +18,7 @@ import mathematicalAttributes.RVector;
  */
 public class R {
 
-    
-      public static double[] sumArrays(double[] a, double[] b) {
+    public static double[] sumArrays(double[] a, double[] b) {
         if (a.length != b.length) {
             throw new RuntimeException("Tried to add two arrays of different lengths");
         }
@@ -29,6 +28,18 @@ public class R {
         }
         return temp;
     }
+
+    public static double[] multiplyArrays(double[] a, double[] b) {
+        if (a.length != b.length) {
+            throw new RuntimeException("Tried to add two arrays of different lengths");
+        }
+        double[] temp = new double[a.length];
+        for (int i = 0; i < a.length; i++) {
+            temp[i] = a[i] * b[i];
+        }
+        return temp;
+    }
+
     public static double[] differenceArrays(double[] a, double[] b) {
         if (a.length != b.length) {
             throw new RuntimeException("Tried to add two arrays of different lengths");
@@ -39,7 +50,7 @@ public class R {
         }
         return temp;
     }
-    
+
     public static String padString(String str, int length) {
         String ns = str;
         int diff = length - str.length();
@@ -534,6 +545,4 @@ public class R {
         return false;
     }
 
-  
-    
 }
