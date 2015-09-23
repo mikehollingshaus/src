@@ -49,4 +49,30 @@ public class WorkBench {
 
     }
 
+    public CohortComponentModel getModel() {
+        return model;
+    }
+
+    public void setModel(CohortComponentModel model) {
+        this.model = model;
+    }
+
+    public ModelConstraints getModelConstraints() {
+        return modelConstraints;
+    }
+
+    public void setModelConstraints(ModelConstraints modelConstraints) {
+        this.modelConstraints = modelConstraints;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+    
+    
+
 }

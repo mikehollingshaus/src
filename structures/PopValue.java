@@ -11,7 +11,8 @@ package structures;
  */
 public class PopValue {
 
-    private double totalSize, femSize, maleSize;
+    
+    private double totalSize, maleSize, femSize;
 
     private final Time date;
     private final Region region;
@@ -187,4 +188,7 @@ public class PopValue {
         return new PopValue(date, region, status, home, new AgeDistribution(maleDistribution), new AgeDistribution(femDistribution), new Mortality(maleMort), new Mortality(femMort), new Fertility(fert), new Migration(maleMig), new Migration(femMig));
     }
 
+ 
+
+    
 }

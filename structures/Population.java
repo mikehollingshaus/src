@@ -19,7 +19,9 @@ import tools.CohortComponentModel;
  */
 public class Population {
 
-    // The population value (i.e., the datapoints unique to this population (See object PopValue)
+    private String name;
+
+// The population value (i.e., the datapoints unique to this population (See object PopValue)
     PopValue value;
     // An ordered array of subpopulations
     private Population[] subPopulations;
@@ -342,4 +344,17 @@ public class Population {
         // Pass along the subpopulations
         return new Population(pv, newSubPops);
     }
+
+    public String getName() {
+        if (name==null){
+            return "Unnamed Population";
+        }
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+        
+    }
+
 }
