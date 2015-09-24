@@ -24,7 +24,7 @@ public class PopPyramid extends JPanel {
 
     public PopPyramid(DemApplet1 demAp) {
         this.demApplet = demAp;
-//        this.currentPop = demAp.getUberPop();
+        this.currentPop = demAp.getUberPop();
     }
 
     @Override
@@ -34,7 +34,8 @@ public class PopPyramid extends JPanel {
 //            Population p = currentPop;
 //        Population p = demApplet.getUberPop();
 //        Population p = demApplet.getStockPops()[0];
-        Population p = demApplet.getUberPop();
+//        Population p = demApplet.getUberPop();
+        Population p = currentPop;
         PopValue pv = p.getPopValue();
         AgeDistribution maleDist = pv.getMaleDistribution();
         AgeDistribution femDist = pv.getFemDistribution();
@@ -188,6 +189,7 @@ public class PopPyramid extends JPanel {
 
     public void setCurrentPop(Population currentPop) {
         this.currentPop = currentPop;
+        repaint();
     }
 
     public enum PyramidType {

@@ -5,6 +5,8 @@
  */
 package structures;
 
+import java.util.Arrays;
+import java.util.Vector;
 import javax.swing.tree.DefaultMutableTreeNode;
 import structures.DemographicForce.DemographicForceType;
 import tools.CohortComponentModel;
@@ -18,7 +20,7 @@ import tools.CohortComponentModel;
  * population.
  *
  */
-public class Population {
+public class Population extends DefaultMutableTreeNode {
 
     private String name;
 
@@ -35,12 +37,17 @@ public class Population {
         this.value = v;
         this.subPopulations = subPops;
 
+        updateChildren();
         // Update the age structures and population sizes appropriately
         buildAgeDistributionFromSubPops();
     }
     /*
      Constructs a leaf population with the supplied value
      */
+
+    private void updateChildren() {
+        this.children = new Vector(Arrays.asList(subPopulations));
+    }
 
     public Population(PopValue v) {
         // Store the value and the array of children
@@ -189,10 +196,6 @@ public class Population {
         }
         // Pass along the subpopulations
         return new Population(pv, newSubPops);
-    }
-
-    private boolean isLeaf() {
-        return subPopulations == null;
     }
 
     /*
@@ -347,7 +350,7 @@ public class Population {
     }
 
     public String getName() {
-        if (name==null){
+        if (name == null) {
             return "Unnamed Population";
         }
         return name;
@@ -355,7 +358,7 @@ public class Population {
 
     public void setName(String name) {
         this.name = name;
-        
+
     }
 
     public PopValue getValue() {
@@ -365,6 +368,12 @@ public class Population {
     public Population[] getSubPopulations() {
         return subPopulations;
     }
-    
-
+/*
+    public DefaultMutableTreeNode getTreeNode() {
+        return new DefaultMutableTreeNode(name);
+    }
+*/
+    public String toString(){
+        return name;
+    }
 }
