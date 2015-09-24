@@ -32,11 +32,16 @@ public class CohortComponentModel {
     private final DataFrame dataFrame;
 //    private final Population pop0;
     Population basePop;
-    private Population[] stockPops, allDeaths, allMigrants, allBirths;
+    private Population[] stockPops, deathPops, migrantPops, birthPops;
+    private Population treeOfStockPops;
 
     public CohortComponentModel(ModelConstraints mc, DataFrame datf) {
         this.modelConstraints = mc;
         this.dataFrame = datf;
+        this.stockPops = new Population[modelConstraints.getNumYears()];
+        this.deathPops = new Population[modelConstraints.getNumYears()];
+        this.migrantPops = new Population[modelConstraints.getNumYears()];
+        this.birthPops = new Population[modelConstraints.getNumYears()];
     }
 
     public void build1() {
@@ -62,45 +67,29 @@ public class CohortComponentModel {
         // Create the population
         // First, create the population value
         this.basePop = new Population(new PopValue(new Time(2010, 4, 1), new Region("Utah State"), new Status(StatusType.NORMAL_POP), new Home(HomeType.HOUSEHOLD), malePop, femPop));
-   
-        Population pop2010 = basePop;
-        
-        pop2010.setName("Utah State Population 2010");
+        basePop.setName("Utah State Population 2010");
         // Set the Demographic forces
-        pop2010.setMaleMort(new Mortality(maleMort));
-        pop2010.setFemMort(new Mortality(femMort));
-        pop2010.setFert(new Fertility(fert));
+
+        basePop.setMaleMort(new Mortality(maleMort));
+        basePop.setFemMort(new Mortality(femMort));
+        basePop.setFert(new Fertility(fert));
         // For now, just use the one migration value
-        pop2010.setMaleMig(new Migration(maleMig));
-        pop2010.setFemMig(new Migration(femMig));
+        basePop.setMaleMig(new Migration(maleMig));
+        basePop.setFemMig(new Migration(femMig));
 
-        Population deaths = pop2010.applyForce(DemographicForceType.MORTALITY);
-        deaths.setName("Utah State Deaths 2010");
-        Population postMort = pop2010.subtractPopulation(deaths);
-//        postMort.setName("Utah State PostMort 2010");
-        Population migrants = postMort.applyForce(DemographicForceType.MIGRATION);
-        migrants.setName("Utah State Migrants 2010");
-        Population postMig = postMort.addPopulation(migrants);
-//        postMig.setName("Utah State PostMig 2010");
-        Population halfDeaths = deaths.multiplyByConstant(0.5);
-        Population fertPop = postMig.addPopulation(halfDeaths);
-//        deaths.setName("Utah State FertPop 2010");
-        Population births = fertPop.applyForce(DemographicForceType.FERTILITY);
-        births.setName("Utah State Births 2010");
-        Population targetPop = postMig.agePop(births, 12);
-        targetPop.setName("Utah State Projected Pop 2011");
-
-        stockPops = new Population[9];
-        stockPops[0] = pop2010;
-        stockPops[1] = deaths;
-        stockPops[2] = postMort;
-        stockPops[3] = migrants;
-        stockPops[4] = postMig;
-        stockPops[5] = halfDeaths;
-        stockPops[6] = fertPop;
-        stockPops[7] = births;
-        stockPops[8] = targetPop;
-
+        project();
+        /*
+         stockPops = new Population[9];
+         stockPops[0] = launchPop;
+         stockPops[1] = deaths;
+         stockPops[2] = postMort;
+         stockPops[3] = migrants;
+         stockPops[4] = postMig;
+         stockPops[5] = halfDeaths;
+         stockPops[6] = fertPop;
+         stockPops[7] = births;
+         stockPops[8] = targetPop;
+         */
 //        Population changePop = targetPop.subtractPopulation(pop2010);
         // Now, run the cohort component model
         /*        
@@ -123,15 +112,38 @@ public class CohortComponentModel {
          */
     }
 
-    public void project(){
-             
-        for (int i = modelConstraints.getBegYear(); i <= modelConstraints.getEndYear();i++){
-            
+    public void project() {
+        stockPops[0] = basePop;
+        Population targetPop = stockPops[0];
+
+        int yr0 = modelConstraints.getBegYear();
+        int yrk = modelConstraints.getEndYear();
+
+        for (int i = modelConstraints.getBegYear(); i < yrk; i++) {
+            Population launchPop = targetPop;
+            Population deaths = launchPop.applyForce(DemographicForceType.MORTALITY);
+            deaths.setName("Utah State Deaths " + i);
+            Population postMort = launchPop.subtractPopulation(deaths);
+            Population migrants = postMort.applyForce(DemographicForceType.MIGRATION);
+            migrants.setName("Utah State Migrants " + i);
+            Population postMig = postMort.addPopulation(migrants);
+            Population halfDeaths = deaths.multiplyByConstant(0.5);
+            Population fertPop = postMig.addPopulation(halfDeaths);
+            Population births = fertPop.applyForce(DemographicForceType.FERTILITY);
+            births.setName("Utah State Births " + i);
+            targetPop = postMig.agePop(births, 12);
+            targetPop.setName("Utah State Projected Pop" + (i + 1));
+
+            stockPops[i - yr0 + 1] = targetPop;
+            deathPops[i - yr0] = deaths;
+            migrantPops[i - yr0] = migrants;
+            birthPops[i - yr0] = births;
         }
-        
+
+        treeOfStockPops = new Population(new PopValue(new Time(2010, 4, 1), new Region("Utah State"), new Status(StatusType.NONE), new Home(HomeType.NONE)), stockPops);
     }
-    
-    public Population[] getAllPops() {
+
+    public Population[] getStockPops() {
         return stockPops;
     }
 
@@ -147,22 +159,25 @@ public class CohortComponentModel {
         return basePop;
     }
 
-    public Population[] getAllDeaths() {
-        return allDeaths;
+    public Population[] getDeathPops() {
+        return deathPops;
     }
 
-    public Population[] getAllMigrants() {
-        return allMigrants;
+    public Population[] getMigrantPops() {
+        return migrantPops;
     }
 
-    public Population[] getAllBirths() {
-        return allBirths;
+    public Population[] getBirthPops() {
+        return birthPops;
     }
-    
-    
 
     public void setAllPops(Population[] allPops) {
         this.stockPops = allPops;
     }
+
+    public Population getTreeOfStockPops() {
+        return treeOfStockPops;
+    }
+    
 
 }

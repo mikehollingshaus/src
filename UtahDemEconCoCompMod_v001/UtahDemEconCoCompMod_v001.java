@@ -5,7 +5,7 @@
  */
 package UtahDemEconCoCompMod_v001;
 
-import UtahDemEconCoCompMod_v001.DemApplet1.PyramidType;
+import UtahDemEconCoCompMod_v001.PopPyramid.PyramidType;
 import java.util.Date;
 import javax.swing.JFrame;
 import rules.ModelConstraints;
@@ -22,8 +22,7 @@ public class UtahDemEconCoCompMod_v001 extends JFrame {
 //    private boolean modelBuilt;
 //    private final JFrame apFrame;
     private PyramidType pyramidType;
-    
-    
+
     public UtahDemEconCoCompMod_v001(Date d) {
         super("Cohort Component Applet");
         this.date = d;
@@ -41,16 +40,17 @@ public class UtahDemEconCoCompMod_v001 extends JFrame {
         UtahDemEconCoCompMod_v001 udem = new UtahDemEconCoCompMod_v001(new Date());
         udem.workbench.buildTheModel();
 //        udem.modelBuilt = true;
-//        udem.runApplet();
-        }
+        udem.runApplet();
+    }
 
     private void runApplet() {
         DemApplet1 demAp = new DemApplet1(this);
         add(demAp);
         pack();
-    
+
         setLocation(100, 100);
         setSize(800, 600);
+        setResizable(false);
         setVisible(true);
     }
 
@@ -66,12 +66,12 @@ public class UtahDemEconCoCompMod_v001 extends JFrame {
         return filePath;
     }
 
-    public PyramidType getPyramidType(){
+    public PyramidType getPyramidType() {
         return pyramidType;
     }
     /*
-    public boolean isModelBuilt() {
-        return modelBuilt;
-    }
-*/
+     public boolean isModelBuilt() {
+     return modelBuilt;
+     }
+     */
 }
