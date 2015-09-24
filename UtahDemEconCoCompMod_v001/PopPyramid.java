@@ -5,7 +5,6 @@
  */
 package UtahDemEconCoCompMod_v001;
 
-
 import java.awt.*;
 import javax.swing.JPanel;
 import structures.AgeDistribution;
@@ -18,22 +17,24 @@ import tools.CohortComponentModel;
  * @author u0214256
  */
 public class PopPyramid extends JPanel {
+
     private final DemApplet1 demApplet;
-    
-    public PopPyramid(DemApplet1 demAp){
-        this.demApplet=demAp;
+    private Population currentPop;
+    //    private boolean popInitialized;
+
+    public PopPyramid(DemApplet1 demAp) {
+        this.demApplet = demAp;
+//        this.currentPop = demAp.getUberPop();
     }
-    
-    
-    
-    
-        public void paintComponent(Graphics g){
-        //        if (!udem.isModelBuilt()) {
-//        return;    
-//        }
 
-        Population p = demApplet.getStockPops()[0];
+    @Override
+    public void paintComponent(Graphics g) {
 
+//        if (popInitialized) {
+//            Population p = currentPop;
+//        Population p = demApplet.getUberPop();
+//        Population p = demApplet.getStockPops()[0];
+        Population p = demApplet.getUberPop();
         PopValue pv = p.getPopValue();
         AgeDistribution maleDist = pv.getMaleDistribution();
         AgeDistribution femDist = pv.getFemDistribution();
@@ -43,20 +44,7 @@ public class PopPyramid extends JPanel {
 
         PopPyramid.XAxisMetric xmet = getXMetric(maxObservedValue);
         int maxXAxisValue = getMaxXAxisValue(xmet, maxObservedValue);
-        int xmetScaleDiv = 0;
-        switch (xmet) {
-            case THOUSANDS:
-                xmetScaleDiv = 1000;
-                break;
-            case HUNDREDS:
-                xmetScaleDiv = 100;
-                break;
-            case TWENTIES:
-                xmetScaleDiv = 20;
-                break;
-            default:
-                break;
-        }
+        int xmetScaleDiv = xmet.getNumber();
 
         // Set up the size of the bins
         int numBins = malePop.length;
@@ -105,17 +93,17 @@ public class PopPyramid extends JPanel {
         }
 
         // Show male and female identifers, and total N
-        String maleString = "Male: N=" + Math.round(pv.getMaleSize());
-        String femString = "Female: N=" + Math.round(pv.getFemSize());
+        String maleString = "Male: N=" + Math.round(pv.getMaleSize())/xmet.getNumber();
+        String femString = "Female: N=" + Math.round(pv.getFemSize())/xmet.getNumber();
         g.drawString(maleString, leftX, topY + g.getFontMetrics().getHeight());
         g.drawString(femString, rightX - g.getFontMetrics().stringWidth(femString), topY + g.getFontMetrics().getHeight());
 
-        String titleString = p.getName();
+        String titleString = p.getName() + " (Metric: " + xmet.getName() + ")";
         g.drawString(titleString, midX - g.getFontMetrics().stringWidth(titleString) / 2, g.getFontMetrics().getHeight());
-
+//        }
     }
-    
-      public int[] getPixelDat(double[] data, int scale, int ppm) {
+
+    public int[] getPixelDat(double[] data, int scale, int ppm) {
         int[] temp = new int[data.length];
         for (int i = 0; i < data.length; i++) {
             temp[i] = (int) ((data[i] / scale) * ppm);
@@ -124,20 +112,46 @@ public class PopPyramid extends JPanel {
     }
 
     public int getMaxXAxisValue(XAxisMetric xmet, double observed) {
+        int num = xmet.getNumber();
+        return (int) Math.ceil(observed / num) * num;
+        /*
+         switch (xmet) {
+         case MILLIONS:
+         value = (int) Math.ceil(observed / num) *;
+         break;
+         case HUNDRED_KS:
+         value = (int) Math.ceil(observed / 100000) * 100000;
+         break;
+         case TEN_KS:
+         value = (int) Math.ceil(observed / 10000) * 10000;
+         break;
+         case THOUSANDS:
+         value = (int) Math.ceil(observed / 1000) * 1000;
+         break;
+         case HUNDREDS:
+         value = (int) Math.ceil(observed / 100) * 100;
+         break;
+         case TWENTIES:
+         value = (int) Math.ceil(observed / 20) * 20;
+         break;
+         default:
+         value = -9999;
+         break;
+         }
 
-        switch (xmet) {
-            case THOUSANDS:
-                return (int) Math.ceil(observed / 1000) * 1000;
-            case HUNDREDS:
-                return (int) Math.ceil(observed / 100) * 100;
-            case TWENTIES:
-                return (int) Math.ceil(observed / 20) * 20;
-            default:
-                return -9999;
-        }
+         return value;*/
     }
 
     public XAxisMetric getXMetric(double observed) {
+        if (observed >= 1000000) {
+            return XAxisMetric.MILLIONS;
+        }
+        if (observed >= 100000) {
+            return XAxisMetric.HUNDRED_KS;
+        }
+        if (observed >= 10000) {
+            return XAxisMetric.TEN_KS;
+        }
         if (observed >= 1000) {
             return XAxisMetric.THOUSANDS;
         }
@@ -168,6 +182,14 @@ public class PopPyramid extends JPanel {
 
     }
 
+    public Population getCurrentPop() {
+        return currentPop;
+    }
+
+    public void setCurrentPop(Population currentPop) {
+        this.currentPop = currentPop;
+    }
+
     public enum PyramidType {
 
         SINGLE_YEAR, FIVE_YEAR;
@@ -175,8 +197,47 @@ public class PopPyramid extends JPanel {
 
     public enum XAxisMetric {
 
-        THOUSANDS, HUNDREDS, TWENTIES;
+        MILLIONS("Millions", 1000000), HUNDRED_KS("Hundred Thousands", 100000), TEN_KS("Ten Thousands", 10000), THOUSANDS("Thousands", 1000), HUNDREDS("Hundreds", 100), TWENTIES("Twenties", 20);
+        private final String name;
+        private final int number;
+
+        private XAxisMetric(String name, int number) {
+            this.name = name;
+            this.number = number;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getNumber() {
+            return number;
+        }
+
     }
 
-    
+    // Excess old code down here
+           /*switch (xmet) {
+     case MILLIONS:
+     xmetScaleDiv = 1000000;
+     break;
+     case HUNDRED_KS:
+     xmetScaleDiv = 100000;
+     break;
+     case TEN_KS:
+     xmetScaleDiv = 10000;
+     break;
+     case THOUSANDS:
+     xmetScaleDiv = 1000;
+     break;
+     case HUNDREDS:
+     xmetScaleDiv = 100;
+     break;
+     case TWENTIES:
+     xmetScaleDiv = 20;
+     break;
+     default:
+     break;
+     }
+     */
 }

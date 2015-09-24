@@ -5,6 +5,7 @@
  */
 package structures;
 
+import javax.swing.tree.DefaultMutableTreeNode;
 import structures.DemographicForce.DemographicForceType;
 import tools.CohortComponentModel;
 
@@ -356,5 +357,14 @@ public class Population {
         this.name = name;
         
     }
+
+    public PopValue getValue() {
+        return value;
+    }
+
+    public Population[] getSubPopulations() {
+        return subPopulations;
+    }
+    
 
 }

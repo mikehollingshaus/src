@@ -132,7 +132,7 @@ public class CohortComponentModel {
             Population births = fertPop.applyForce(DemographicForceType.FERTILITY);
             births.setName("Utah State Births " + i);
             targetPop = postMig.agePop(births, 12);
-            targetPop.setName("Utah State Projected Pop" + (i + 1));
+            targetPop.setName("Utah State Projected Pop " + (i + 1));
 
             stockPops[i - yr0 + 1] = targetPop;
             deathPops[i - yr0] = deaths;
@@ -141,7 +141,9 @@ public class CohortComponentModel {
         }
 
         treeOfStockPops = new Population(new PopValue(new Time(2010, 4, 1), new Region("Utah State"), new Status(StatusType.NONE), new Home(HomeType.NONE)), stockPops);
+        treeOfStockPops.setName("Uber Pop");
     }
+    
 
     public Population[] getStockPops() {
         return stockPops;
