@@ -33,7 +33,8 @@ public class CohortComponentModel {
 //    private final Population pop0;
     Population basePop;
     private Population[] stockPops, deathPops, migrantPops, birthPops;
-    private Population treeOfStockPops;
+    private Population treeOfStockPops, treeOfDeathPops, treeOfMigrantPops, treeOfBirthPops;
+    private Population allCCPops;
 
     public CohortComponentModel(ModelConstraints mc, DataFrame datf) {
         this.modelConstraints = mc;
@@ -141,9 +142,22 @@ public class CohortComponentModel {
         }
 
         treeOfStockPops = new Population(new PopValue(new Time(2010, 4, 1), new Region("Utah State"), new Status(StatusType.NONE), new Home(HomeType.NONE)), stockPops);
-        treeOfStockPops.setName("Uber Pop");
+
+//        treeOfDeathPops = new Population(new PopValue(new Time(2010, 4, 1), new Region("Utah State"), new Status(StatusType.NONE), new Home(HomeType.NONE)), deathPops);
+//
+//        treeOfMigrantPops = new Population(new PopValue(new Time(2010, 4, 1), new Region("Utah State"), new Status(StatusType.NONE), new Home(HomeType.NONE)), migrantPops);
+//        treeOfBirthPops = new Population(new PopValue(new Time(2010, 4, 1), new Region("Utah State"), new Status(StatusType.NONE), new Home(HomeType.NONE)), birthPops);
+//
+//        treeOfStockPops.setName("All Stock Pop");
+//        treeOfDeathPops.setName("All Death Pops");
+//        treeOfMigrantPops.setName("All Migrant Pops");
+//        treeOfBirthPops.setName("All Birth Pops");
+//
+//        Population[] bigChildrenPops = {treeOfStockPops, treeOfDeathPops, treeOfMigrantPops, treeOfBirthPops};
+//
+//        allCCPops = new Population(new PopValue(new Time(2010, 4, 1), new Region("Utah State"), new Status(StatusType.NONE), new Home(HomeType.NONE)), bigChildrenPops);
+
     }
-    
 
     public Population[] getStockPops() {
         return stockPops;
@@ -180,6 +194,9 @@ public class CohortComponentModel {
     public Population getTreeOfStockPops() {
         return treeOfStockPops;
     }
-    
+
+    public Population getAllCCPops() {
+        return allCCPops;
+    }
 
 }

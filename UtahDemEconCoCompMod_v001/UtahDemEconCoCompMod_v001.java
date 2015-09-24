@@ -6,6 +6,8 @@
 package UtahDemEconCoCompMod_v001;
 
 import UtahDemEconCoCompMod_v001.PopPyramid.PyramidType;
+import UtahDemEconCoCompMod_v001.PopPyramid.PyramidXAxisMetric;
+
 import java.util.Date;
 import javax.swing.JFrame;
 import rules.ModelConstraints;
@@ -19,9 +21,9 @@ public class UtahDemEconCoCompMod_v001 extends JFrame {
     private final Date date;
     private final WorkBench workbench;
     public static final String filePath = "C:\\Users\\u0214256\\Documents\\Data\\Tables\\cohcompinp1.csv";
-//    private boolean modelBuilt;
-//    private final JFrame apFrame;
     private PyramidType pyramidType;
+
+    public final PyramidXAxisMetric SELECTED_PYR_METRIC = PyramidXAxisMetric.HUNDRED_KS;
 
     public UtahDemEconCoCompMod_v001(Date d) {
         super("Cohort Component Applet");
@@ -31,6 +33,7 @@ public class UtahDemEconCoCompMod_v001 extends JFrame {
 //        this.modelBuilt = false;
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.pyramidType = PyramidType.SINGLE_YEAR;
+//        this.pyrSchema = PyramidXSchema.FIXED;
     }
 
     /**
@@ -39,7 +42,6 @@ public class UtahDemEconCoCompMod_v001 extends JFrame {
     public static void main(String[] args) {
         UtahDemEconCoCompMod_v001 udem = new UtahDemEconCoCompMod_v001(new Date());
         udem.workbench.buildTheModel();
-//        udem.modelBuilt = true;
         udem.runApplet();
     }
 
@@ -74,4 +76,12 @@ public class UtahDemEconCoCompMod_v001 extends JFrame {
      return modelBuilt;
      }
      */
+
+//    public PyramidXSchema getPyrSchema() {
+//        return pyrSchema;
+//    }
+    public PyramidXAxisMetric getSelected_pyr_metric() {
+        return SELECTED_PYR_METRIC;
+    }
+
 }

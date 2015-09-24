@@ -9,6 +9,7 @@ import java.awt.*;
 import java.util.HashMap;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -23,6 +24,7 @@ public final class PopNavigator extends JPanel {
 
     private DemApplet1 demApplet;
 
+//    private JScrollPane scroller;
     private JTree tree;
     private Population uberPop;
     private Population[] allSubPops;
@@ -30,6 +32,7 @@ public final class PopNavigator extends JPanel {
     public PopNavigator(DemApplet1 demAp) {
         this.demApplet = demAp;
         this.uberPop = demAp.getUberPop();
+
         //create the root node
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
 
@@ -49,7 +52,7 @@ public final class PopNavigator extends JPanel {
             popNode.add(garfieldCountyNode);
             DefaultMutableTreeNode slPrison = new DefaultMutableTreeNode("Salt Lake City Prison");
             slCountyNode.add(slPrison);
-           
+
         }
         //create the child nodes
 //        DefaultMutableTreeNode vegetableNode = new DefaultMutableTreeNode(subPops[0].getName?);
@@ -63,11 +66,13 @@ public final class PopNavigator extends JPanel {
         tree = new JTree(root);
         tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
-        add(tree);
+//        scroller = new JScrollPane();
+//        scroller.add(tree);
+        add(new JScrollPane(tree));
+
 //
 //        DefaultMutableTreeNode testNode = allSubPops[0].getTreeNode();
 //        Population testPop = map.get(testNode);
-
         addAllListeners();
 //        this.selectedLabel = new JLabel();
 //        demApplet.add(selectedLabel, BorderLayout.SOUTH);
