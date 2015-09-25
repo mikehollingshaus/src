@@ -7,6 +7,7 @@ package UtahDemEconCoCompMod_v001;
 
 import UtahDemEconCoCompMod_v001.PopPyramid.PyramidType;
 import UtahDemEconCoCompMod_v001.PopPyramid.PyramidXAxisMetric;
+import java.awt.Dimension;
 
 import java.util.Date;
 import javax.swing.JFrame;
@@ -22,7 +23,7 @@ public class UtahDemEconCoCompMod_v001 extends JFrame {
     private final WorkBench workbench;
     public static final String filePath = "C:\\Users\\u0214256\\Documents\\Data\\Tables\\cohcompinp1.csv";
     private PyramidType pyramidType;
-
+ 
     public final PyramidXAxisMetric SELECTED_PYR_METRIC = PyramidXAxisMetric.HUNDRED_KS;
 
     public UtahDemEconCoCompMod_v001(Date d) {
@@ -34,6 +35,7 @@ public class UtahDemEconCoCompMod_v001 extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.pyramidType = PyramidType.SINGLE_YEAR;
 //        this.pyrSchema = PyramidXSchema.FIXED;
+        
     }
 
     /**
@@ -51,8 +53,9 @@ public class UtahDemEconCoCompMod_v001 extends JFrame {
         pack();
 
         setLocation(100, 100);
-        setSize(800, 600);
-        setResizable(false);
+        setSize(1200, 640);
+//        setResizable(false);
+        setMinimumSize(new Dimension(300,400));
         setVisible(true);
     }
 

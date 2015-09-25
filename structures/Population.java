@@ -368,12 +368,51 @@ public class Population extends DefaultMutableTreeNode {
     public Population[] getSubPopulations() {
         return subPopulations;
     }
-/*
-    public DefaultMutableTreeNode getTreeNode() {
-        return new DefaultMutableTreeNode(name);
-    }
-*/
-    public String toString(){
+    /*
+     public DefaultMutableTreeNode getTreeNode() {
+     return new DefaultMutableTreeNode(name);
+     }
+     */
+
+    public String toString() {
         return name;
     }
+
+    public double getTotMedianAge() {
+//        double medianAge = 0;
+        double count = 0;
+        double medPoint = value.getTotalSize() / 2;
+        double[] totDist = value.getTotDistribution().getData();
+        int stopIndex = 0;
+        for (int i = 0; i < totDist.length; i++) {
+            count += totDist[i];
+            if (count > medPoint) {
+                stopIndex = i;
+                break;
+            }
+        }
+//        double lowMed = totDist[stopIndex];
+//        double highMed = totDist[stopIndex + 1];
+                
+        return stopIndex;
+    }
+    
+    public double getDependencyRatio(){
+        double totUnder15 = 0;
+        double tot65Plus = 0;
+        double totInBetween = 0;
+        double[] totDist = value.getTotDistribution().getData();
+        for (int i = 0; i < 15; i++){
+            totUnder15+=totDist[i];
+        }
+        for (int i = 65; i < totDist.length; i++){
+            tot65Plus+=totDist[i];
+        }
+        double dependent = totUnder15+tot65Plus;
+        totInBetween = value.getTotalSize()-dependent;
+        
+        return dependent/totInBetween*100;
+    
+    }
+
 }

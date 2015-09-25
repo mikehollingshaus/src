@@ -14,10 +14,10 @@ public class DemApplet1 extends JApplet {
     private PopPyramid popPyramid;
     private CohortComponentModel ccm;
     private PopNavigator popNavigator;
-    private MetricSelector metSelect;
+//    private MetricSelector metSelect;
+    private MetricSlide metSlide;
     private Population uberPop;
-    
-    
+
     public DemApplet1(UtahDemEconCoCompMod_v001 demMod) {
         this.udem = demMod;
         this.ccm = udem.getWorkbench().getModel();
@@ -28,15 +28,15 @@ public class DemApplet1 extends JApplet {
         this.popNavigator = new PopNavigator(this);
         this.add(popNavigator, BorderLayout.WEST);
         this.add(popPyramid, BorderLayout.CENTER);
-        this.metSelect = new MetricSelector(this);
-        this.add(metSelect, BorderLayout.SOUTH);
-        
+//        this.metSelect = new MetricSelector(this);
+//        this.add(metSelect, BorderLayout.SOUTH);
+        this.metSlide = new MetricSlide(this);
+        this.add(metSlide, BorderLayout.SOUTH);
+
         repaint();
-        
+
     }
 
-    
-    
     /*@Override
      public void paint(Graphics g) {
      paintChildren(g);
@@ -77,8 +77,5 @@ public class DemApplet1 extends JApplet {
     public PopNavigator getPopNavigator() {
         return popNavigator;
     }
-    
-    
 
-    
 }
