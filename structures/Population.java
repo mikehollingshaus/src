@@ -47,6 +47,7 @@ public class Population extends DefaultMutableTreeNode {
 
     private void updateChildren() {
         this.children = new Vector(Arrays.asList(subPopulations));
+      
     }
 
     public Population(PopValue v) {

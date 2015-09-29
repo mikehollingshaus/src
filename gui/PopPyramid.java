@@ -27,8 +27,7 @@ public class PopPyramid extends JPanel {
     //    private boolean popInitialized;
     public PopPyramid(DemApplet1 demAp) {
         this.demApplet = demAp;
-//        this.currentPop = demAp.getTreeOfStockPops();
-        this.currentPop = demAp.getCcm().getTreeOfStockPops().getSubPopulations()[0];
+        this.currentPop = demAp.getCcm().getTreeOfStockPops();
         Population tempUber = demAp.getCcm().getAllCCPops();
         this.beginDrawing = false;
         this.maxXValue = demApplet.getUdem().SELECTED_PYR_METRIC.getNumber();

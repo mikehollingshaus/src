@@ -28,32 +28,17 @@ public final class PopNavigator extends JPanel {
 
     public PopNavigator(DemApplet1 demAp) {
         this.demApplet = demAp;
-        this.uberPop = demAp.getTreeOfStockPops();
-
+//        this.uberPop = demAp.getTreeOfStockPops();
+//        this.uberPop = demAp.getCcm().getAllCCPops().getSubPopulations()[3];
+            this.uberPop = demAp.getCcm().getAllCCPops();
         //create the root node
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
+//        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
+        DefaultMutableTreeNode root = uberPop;
 
         this.allSubPops = uberPop.getSubPopulations();
-
-        for (Population p : allSubPops) {
-            // If it has subpops
-            // for (Population ps: p.getSubPopulations()
-            DefaultMutableTreeNode popNode = p;
-
-            root.add(popNode);
-            DefaultMutableTreeNode utahCountyNode = new DefaultMutableTreeNode("Utah County");
-            DefaultMutableTreeNode slCountyNode = new DefaultMutableTreeNode("Salt Lake County");
-            DefaultMutableTreeNode garfieldCountyNode = new DefaultMutableTreeNode("Garfield County");
-            popNode.add(utahCountyNode);
-            popNode.add(slCountyNode);
-            popNode.add(garfieldCountyNode);
-            DefaultMutableTreeNode slPrison = new DefaultMutableTreeNode("Salt Lake City Prison");
-            slCountyNode.add(slPrison);
-
-        }
-
-        tree = new JTree(root);
-        tree.setRootVisible(false);
+   
+          tree = new JTree(root);
+//        tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
         add(new JScrollPane(tree));
 
