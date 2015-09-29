@@ -1,11 +1,10 @@
-package UtahDemEconCoCompMod_v001;
+package gui;
 
+import UtahDemEconCoCompMod_v001.UtahDemEconCoCompMod_v001;
 import java.awt.*;
 import javax.swing.JApplet;
-import structures.AgeDistribution;
-import structures.PopValue;
 import structures.Population;
-import tools.CohortComponentModel;
+import UtahDemEconCoCompMod_v001.CohortComponentModel;
 
 public class DemApplet1 extends JApplet {
 
@@ -14,38 +13,24 @@ public class DemApplet1 extends JApplet {
     private PopPyramid popPyramid;
     private CohortComponentModel ccm;
     private PopNavigator popNavigator;
-//    private MetricSelector metSelect;
     private MetricSlide metSlide;
-    private Population uberPop;
+    private Population treeOfStockPops;
 
     public DemApplet1(UtahDemEconCoCompMod_v001 demMod) {
         this.udem = demMod;
         this.ccm = udem.getWorkbench().getModel();
         this.stockPops = ccm.getStockPops();
-        uberPop = ccm.getTreeOfStockPops();
+        treeOfStockPops = ccm.getTreeOfStockPops();
         this.setLayout(new BorderLayout());
         this.popPyramid = new PopPyramid(this);
         this.popNavigator = new PopNavigator(this);
         this.add(popNavigator, BorderLayout.WEST);
         this.add(popPyramid, BorderLayout.CENTER);
-//        this.metSelect = new MetricSelector(this);
-//        this.add(metSelect, BorderLayout.SOUTH);
         this.metSlide = new MetricSlide(this);
         this.add(metSlide, BorderLayout.SOUTH);
-
         repaint();
-
     }
 
-    /*@Override
-     public void paint(Graphics g) {
-     paintChildren(g);
-     //        if (!udem.isModelBuilt()) {
-     //        return;    
-     //        }
-
-     }
-     */
     public UtahDemEconCoCompMod_v001 getUdem() {
         return udem;
     }
@@ -66,10 +51,7 @@ public class DemApplet1 extends JApplet {
         return birthPops;
     }
 
-    public Population getUberPop() {
-        return uberPop;
-    }
-
+   
     public PopPyramid getPopPyramid() {
         return popPyramid;
     }
@@ -78,4 +60,18 @@ public class DemApplet1 extends JApplet {
         return popNavigator;
     }
 
+    public CohortComponentModel getCcm() {
+        return ccm;
+    }
+
+    public MetricSlide getMetSlide() {
+        return metSlide;
+    }
+
+    public Population getTreeOfStockPops() {
+        return treeOfStockPops;
+    }
+
+    
+    
 }

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package tools;
+package UtahDemEconCoCompMod_v001;
 
 import mathematicalAttributes.NumericObjectVector;
 import rules.ModelConstraints;
@@ -20,6 +20,7 @@ import structures.Region;
 import structures.Status;
 import structures.Status.StatusType;
 import structures.Time;
+import tools.DataFrame;
 
 /**
  *
@@ -40,9 +41,9 @@ public class CohortComponentModel {
         this.modelConstraints = mc;
         this.dataFrame = datf;
         this.stockPops = new Population[modelConstraints.getNumYears()];
-        this.deathPops = new Population[modelConstraints.getNumYears()];
-        this.migrantPops = new Population[modelConstraints.getNumYears()];
-        this.birthPops = new Population[modelConstraints.getNumYears()];
+        this.deathPops = new Population[modelConstraints.getNumYears() - 1];
+        this.migrantPops = new Population[modelConstraints.getNumYears() - 1];
+        this.birthPops = new Population[modelConstraints.getNumYears() - 1];
     }
 
     public void build1() {
@@ -79,38 +80,7 @@ public class CohortComponentModel {
         basePop.setFemMig(new Migration(femMig));
 
         project();
-        /*
-         stockPops = new Population[9];
-         stockPops[0] = launchPop;
-         stockPops[1] = deaths;
-         stockPops[2] = postMort;
-         stockPops[3] = migrants;
-         stockPops[4] = postMig;
-         stockPops[5] = halfDeaths;
-         stockPops[6] = fertPop;
-         stockPops[7] = births;
-         stockPops[8] = targetPop;
-         */
-//        Population changePop = targetPop.subtractPopulation(pop2010);
-        // Now, run the cohort component model
-        /*        
-         PopValue pv2010Copy = new PopValue(new Time(2010, 4, 1), new Region("Utah State"), new Status(StatusType.NORMAL_POP), new Home(HomeType.HOUSEHOLD), malePop, femPop);
-         Population pop2010Copy = new Population(pv2010Copy);
-         PopValue pvTest = new PopValue(pv2010.getDate(), new Region("Bigger than Utah State"), pv2010.getStatus(), pv2010.getHome());
-         Population[] kidArray = {pop2010, pop2010Copy};
-         Population bigPop = new Population(pvTest, kidArray);
-         */
-        System.out.println("test");
 
-//public PopValue(Time date, Region region, Status status, Home home, AgeDistribution maleStruct, AgeDistribution femStruct)
-        /*        for (int i = 0; i < yearArray.length; i++) {
-
-         double launchyear = yearArray[i];
-         PointPopulation targetPop // Run the model
-
-         launchPop = 
-         }
-         */
     }
 
     public void project() {
@@ -142,20 +112,19 @@ public class CohortComponentModel {
         }
 
         treeOfStockPops = new Population(new PopValue(new Time(2010, 4, 1), new Region("Utah State"), new Status(StatusType.NONE), new Home(HomeType.NONE)), stockPops);
+        treeOfDeathPops = new Population(new PopValue(new Time(2010, 4, 1), new Region("Utah State"), new Status(StatusType.NONE), new Home(HomeType.NONE)), deathPops);
+        treeOfMigrantPops = new Population(new PopValue(new Time(2010, 4, 1), new Region("Utah State"), new Status(StatusType.NONE), new Home(HomeType.NONE)), migrantPops);
+        treeOfBirthPops = new Population(new PopValue(new Time(2010, 4, 1), new Region("Utah State"), new Status(StatusType.NONE), new Home(HomeType.NONE)), birthPops);
 
-//        treeOfDeathPops = new Population(new PopValue(new Time(2010, 4, 1), new Region("Utah State"), new Status(StatusType.NONE), new Home(HomeType.NONE)), deathPops);
+        treeOfStockPops.setName("All Stock Pop");
+        treeOfDeathPops.setName("All Death Pops");
+        treeOfMigrantPops.setName("All Migrant Pops");
+        treeOfBirthPops.setName("All Birth Pops");
 //
-//        treeOfMigrantPops = new Population(new PopValue(new Time(2010, 4, 1), new Region("Utah State"), new Status(StatusType.NONE), new Home(HomeType.NONE)), migrantPops);
-//        treeOfBirthPops = new Population(new PopValue(new Time(2010, 4, 1), new Region("Utah State"), new Status(StatusType.NONE), new Home(HomeType.NONE)), birthPops);
+        Population[] bigChildrenPops = {treeOfStockPops, treeOfDeathPops, treeOfMigrantPops, treeOfBirthPops};
 //
-//        treeOfStockPops.setName("All Stock Pop");
-//        treeOfDeathPops.setName("All Death Pops");
-//        treeOfMigrantPops.setName("All Migrant Pops");
-//        treeOfBirthPops.setName("All Birth Pops");
-//
-//        Population[] bigChildrenPops = {treeOfStockPops, treeOfDeathPops, treeOfMigrantPops, treeOfBirthPops};
-//
-//        allCCPops = new Population(new PopValue(new Time(2010, 4, 1), new Region("Utah State"), new Status(StatusType.NONE), new Home(HomeType.NONE)), bigChildrenPops);
+        allCCPops = new Population(new PopValue(new Time(2010, 4, 1), new Region("Utah State"), new Status(StatusType.NONE), new Home(HomeType.NONE)), bigChildrenPops);
+        allCCPops.setName("All population stocks, deaths, migrations, and births");
 
     }
 

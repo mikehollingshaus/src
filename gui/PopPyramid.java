@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package UtahDemEconCoCompMod_v001;
+package gui;
 
 import java.awt.*;
 import java.text.DecimalFormat;
@@ -11,7 +11,6 @@ import javax.swing.JPanel;
 import structures.AgeDistribution;
 import structures.PopValue;
 import structures.Population;
-import tools.CohortComponentModel;
 
 /**
  *
@@ -24,14 +23,15 @@ public class PopPyramid extends JPanel {
     private boolean beginDrawing;
     private int maxXValue;
     public static int TICK_HEIGHT = 10;
-
+    
     //    private boolean popInitialized;
     public PopPyramid(DemApplet1 demAp) {
         this.demApplet = demAp;
-        this.currentPop = demAp.getUberPop();
+//        this.currentPop = demAp.getTreeOfStockPops();
+        this.currentPop = demAp.getCcm().getTreeOfStockPops().getSubPopulations()[0];
+        Population tempUber = demAp.getCcm().getAllCCPops();
         this.beginDrawing = false;
         this.maxXValue = demApplet.getUdem().SELECTED_PYR_METRIC.getNumber();
-
 //        this.setSize(new Dimension(1090,675));
     }
 
@@ -42,18 +42,13 @@ public class PopPyramid extends JPanel {
         if (!beginDrawing) {
             return;
         }
-//        if (popInitialized) {
-//            Population p = currentPop;
-//        Population p = demApplet.getUberPop();
-//        Population p = demApplet.getStockPops()[0];
-//        Population p = demApplet.getUberPop();
+
         Population p = currentPop;
         PopValue pv = p.getPopValue();
         AgeDistribution maleDist = pv.getMaleDistribution();
         AgeDistribution femDist = pv.getFemDistribution();
         double[] malePop = getPyramidDat(maleDist.getData());
         double[] femPop = getPyramidDat(femDist.getData());
-//        double maxObservedValue = Math.max(getLargestValue(malePop), getLargestValue(femPop));
 
         // Set up the size of the bins
         int numBins = malePop.length;
@@ -69,7 +64,6 @@ public class PopPyramid extends JPanel {
 
         int workingXRange = rightX - midX;
 
-//        PopPyramid.PyramidXAxisMetric maxXValue = demApplet.getUdem().getSelected_pyr_metric();
         int[] scaledMale = getNumPixels(malePop, maxXValue, workingXRange);
         int[] scaledFem = getNumPixels(femPop, maxXValue, workingXRange);
 
@@ -102,17 +96,17 @@ public class PopPyramid extends JPanel {
         // Show male and female identifers, and total N
         String maleString = "Male: N=" + formatter.format(pv.getMaleSize());
         String femString = "Female: N=" + formatter.format(pv.getFemSize());
+        String totString = "Total: N=" + formatter.format(pv.getTotalSize());
+              
         g.drawString(maleString, leftX, topY + g.getFontMetrics().getHeight());
         g.drawString(femString, rightX - g.getFontMetrics().stringWidth(femString), topY + g.getFontMetrics().getHeight());
-
-        g.drawString("Tot Median Age: " + formatter.format(p.getTotMedianAge()), leftX, topY + g.getFontMetrics().getHeight()*3);
-        g.drawString("Dependency Ratio: " + p.getDependencyRatio(), leftX, topY + g.getFontMetrics().getHeight()*6);
-        String titleString = p.getName();// + " (Metric: " + maxXValue.getName();
+        g.drawString(totString, leftX, topY + g.getFontMetrics().getHeight() * 3);
+        
+        g.drawString("Tot Median Age: " + formatter.format(p.getTotMedianAge()), leftX, topY + g.getFontMetrics().getHeight() * 5);
+        g.drawString("Dependency Ratio: " + p.getDependencyRatio(), leftX, topY + g.getFontMetrics().getHeight() * 7);
+        String titleString = p.getName();
         g.drawString(titleString, midX - g.getFontMetrics().stringWidth(titleString) / 2, g.getFontMetrics().getHeight());
-//        g.drawString(getWidth() + ": " + getHeight(), getWidth() - g.getFontMetrics().stringWidth(titleString),getHeight());
 
-        // Draw x axis
-//        int[] tickX = new int[11];
         g.setColor(Color.BLACK);
         double spacePerTick = workingXRange / 5;
         g.drawLine(leftX, bottomY, leftX, bottomY + TICK_HEIGHT);
@@ -136,7 +130,6 @@ public class PopPyramid extends JPanel {
         for (int i = 0; i < data.length; i++) {
             temp[i] = (int) (data[i] / (maxVal / xRange));
         }
-
         return temp;
     }
 
@@ -144,26 +137,6 @@ public class PopPyramid extends JPanel {
         int num = xmet.getNumber();
         return (int) Math.ceil(observed / num) * num;
     }
-    /*
-     public PyramidXAxisMetric getXMetric(double observed) {
-     if (observed >= PyramidXAxisMetric.MILLIONS.getNumber()) {
-     return PyramidXAxisMetric.MILLIONS;
-     }
-     if (observed >= PyramidXAxisMetric.HUNDRED_KS.getNumber()) {
-     return PyramidXAxisMetric.HUNDRED_KS;
-     }
-     if (observed >= PyramidXAxisMetric.TEN_KS.getNumber()) {
-     return PyramidXAxisMetric.TEN_KS;
-     }
-     if (observed >= PyramidXAxisMetric.THOUSANDS.getNumber()) {
-     return PyramidXAxisMetric.THOUSANDS;
-     }
-     if (observed >= PyramidXAxisMetric.HUNDREDS.getNumber()) {
-     return PyramidXAxisMetric.HUNDREDS;
-     }
-     return PyramidXAxisMetric.TWENTIES;
-     }
-     */
 
     public double[] getPyramidDat(double[] dat) {
         switch (demApplet.getUdem().getPyramidType()) {
@@ -220,15 +193,6 @@ public class PopPyramid extends JPanel {
             return number;
         }
     }
-    /*
-     public void setXmet(PyramidXAxisMetric metric) {
-     maxXValue = metric;
-     }
-
-     public PyramidXAxisMetric getXMet() {
-     return maxXValue;
-     }
-     */
 
     public int getMaxXValue() {
         return maxXValue;
@@ -238,5 +202,4 @@ public class PopPyramid extends JPanel {
         this.maxXValue = maxXValue;
         repaint();
     }
-
 }

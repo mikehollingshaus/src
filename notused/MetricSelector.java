@@ -3,9 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package UtahDemEconCoCompMod_v001;
+package notused;
 
-import UtahDemEconCoCompMod_v001.PopPyramid.PyramidXAxisMetric;
+import gui.DemApplet1;
+import gui.DemApplet1;
+import gui.PopPyramid.PyramidXAxisMetric;
 import java.awt.event.ActionEvent;
 import javax.swing.ButtonGroup;
 import javax.swing.JPanel;

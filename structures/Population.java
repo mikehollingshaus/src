@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.Vector;
 import javax.swing.tree.DefaultMutableTreeNode;
 import structures.DemographicForce.DemographicForceType;
-import tools.CohortComponentModel;
+import UtahDemEconCoCompMod_v001.CohortComponentModel;
 
 /**
  *

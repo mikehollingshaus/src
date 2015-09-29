@@ -5,8 +5,9 @@
  */
 package UtahDemEconCoCompMod_v001;
 
-import UtahDemEconCoCompMod_v001.PopPyramid.PyramidType;
-import UtahDemEconCoCompMod_v001.PopPyramid.PyramidXAxisMetric;
+import gui.DemApplet1;
+import gui.PopPyramid.PyramidType;
+import gui.PopPyramid.PyramidXAxisMetric;
 import java.awt.Dimension;
 
 import java.util.Date;

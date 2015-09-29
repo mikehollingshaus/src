@@ -6,7 +6,6 @@
 package UtahDemEconCoCompMod_v001;
 
 import rules.ModelConstraints;
-import tools.CohortComponentModel;
 import tools.DataFrame;
 import tools.CSVDatasetReader;
 import tools.Tester;
