@@ -36,6 +36,7 @@ public class CohortComponentModel {
     private Population[] stockPops, deathPops, migrantPops, birthPops;
     private Population treeOfStockPops, treeOfDeathPops, treeOfMigrantPops, treeOfBirthPops;
     private Population allCCPops;
+    
 
     public CohortComponentModel(ModelConstraints mc, DataFrame datf) {
         this.modelConstraints = mc;

@@ -19,26 +19,16 @@ import structures.Population;
  */
 public final class PopNavigator extends JPanel {
 
-    private DemApplet1 demApplet;
-
-//    private JScrollPane scroller;
-    private JTree tree;
-    private Population uberPop;
-    private Population[] allSubPops;
+    private final DemApplet1 demApplet;
+    private final JTree tree;
 
     public PopNavigator(DemApplet1 demAp) {
         this.demApplet = demAp;
-//        this.uberPop = demAp.getTreeOfStockPops();
-//        this.uberPop = demAp.getCcm().getAllCCPops().getSubPopulations()[3];
-            this.uberPop = demAp.getCcm().getAllCCPops();
-        //create the root node
-//        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
-        DefaultMutableTreeNode root = uberPop;
 
-        this.allSubPops = uberPop.getSubPopulations();
-   
-          tree = new JTree(root);
-//        tree.setRootVisible(false);
+        //create the root node
+        DefaultMutableTreeNode root = demAp.getCcm().getAllCCPops();
+        tree = new JTree(root);
+        tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
         add(new JScrollPane(tree));
 

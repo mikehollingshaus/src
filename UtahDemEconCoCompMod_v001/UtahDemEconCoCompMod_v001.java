@@ -9,8 +9,8 @@ import gui.DemApplet1;
 import gui.PopPyramid.PyramidType;
 import gui.PopPyramid.PyramidXAxisMetric;
 import java.awt.Dimension;
-
-import java.util.Date;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import javax.swing.JFrame;
 import rules.ModelConstraints;
 
@@ -20,30 +20,33 @@ import rules.ModelConstraints;
  */
 public class UtahDemEconCoCompMod_v001 extends JFrame {
 
-    private final Date date;
+    
+    This line of code prevents this old file from accidentally running
+    
+    private GregorianCalendar calendar;
     private final WorkBench workbench;
     public static final String filePath = "C:\\Users\\u0214256\\Documents\\Data\\Tables\\cohcompinp1.csv";
     private PyramidType pyramidType;
- 
+
     public final PyramidXAxisMetric SELECTED_PYR_METRIC = PyramidXAxisMetric.HUNDRED_KS;
 
-    public UtahDemEconCoCompMod_v001(Date d) {
+    public UtahDemEconCoCompMod_v001(GregorianCalendar calendar) {
         super("Cohort Component Applet");
-        this.date = d;
+        this.calendar = calendar;
         ModelConstraints mc1 = new ModelConstraints(2010, 2066);
         this.workbench = new WorkBench(mc1, filePath);
-//        this.modelBuilt = false;
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.pyramidType = PyramidType.SINGLE_YEAR;
-//        this.pyrSchema = PyramidXSchema.FIXED;
-        
+
     }
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        UtahDemEconCoCompMod_v001 udem = new UtahDemEconCoCompMod_v001(new Date());
+
+        UtahDemEconCoCompMod_v001 udem = new UtahDemEconCoCompMod_v001(new GregorianCalendar());
+        System.out.println("Model Date: " + udem.calendar.getTime());
         udem.workbench.buildTheModel();
         udem.runApplet();
     }
@@ -52,16 +55,14 @@ public class UtahDemEconCoCompMod_v001 extends JFrame {
         DemApplet1 demAp = new DemApplet1(this);
         add(demAp);
         pack();
-
         setLocation(100, 100);
         setSize(1200, 640);
-//        setResizable(false);
-        setMinimumSize(new Dimension(300,400));
+        setMinimumSize(new Dimension(300, 400));
         setVisible(true);
     }
 
-    public Date getDate() {
-        return date;
+    public Calendar getCalendar() {
+        return calendar;
     }
 
     public WorkBench getWorkbench() {
@@ -75,15 +76,7 @@ public class UtahDemEconCoCompMod_v001 extends JFrame {
     public PyramidType getPyramidType() {
         return pyramidType;
     }
-    /*
-     public boolean isModelBuilt() {
-     return modelBuilt;
-     }
-     */
 
-//    public PyramidXSchema getPyrSchema() {
-//        return pyrSchema;
-//    }
     public PyramidXAxisMetric getSelected_pyr_metric() {
         return SELECTED_PYR_METRIC;
     }

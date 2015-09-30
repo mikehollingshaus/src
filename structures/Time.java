@@ -5,12 +5,19 @@
  */
 package structures;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 /**
  *
  * @author u0214256
  */
 public class Time {
 
+    
+//            this.calendar = new GregorianCalendar(2010, Calendar.FEBRUARY, 29, 12, 0, 0);
+    
+    
     public final int year, month, day;
 
     public Time(int year, int month, int day) {

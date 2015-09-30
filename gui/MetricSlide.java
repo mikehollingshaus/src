@@ -5,14 +5,9 @@
  */
 package gui;
 
-
-import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
@@ -23,7 +18,7 @@ import javax.swing.event.ChangeListener;
  *
  * @author u0214256
  */
-public class MetricSlide extends JPanel implements ActionListener, ChangeListener {
+public class MetricSlide extends JPanel implements ChangeListener {
 
     private DemApplet1 demApplet;
     private JSlider slider;
@@ -44,13 +39,12 @@ public class MetricSlide extends JPanel implements ActionListener, ChangeListene
         add(slider);//,BorderLayout.WEST);
 
         slider.addChangeListener(this);
-        
-        text.addKeyListener(new KeyAdapter(){
+
+        text.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent ke) {
                 String typed = text.getText();
-//                slider.setValue(0);
-                if(!typed.matches("\\d+")) {
+                if (!typed.matches("\\d+")) {
                     return;
                 }
                 int value = Integer.parseInt(typed);
@@ -63,22 +57,8 @@ public class MetricSlide extends JPanel implements ActionListener, ChangeListene
     @Override
     public void stateChanged(ChangeEvent e) {
         JSlider source = (JSlider) e.getSource();
-//        if (!source.getValueIsAdjusting()) {
         int newMax = (int) source.getValue();
         demApplet.getPopPyramid().setMaxXValue(newMax);
         text.setText(Integer.toString(slider.getValue()));
-//        }    
-
     }
-
-//    public void addChangedListener(ChangeEvent e) {
-//    
-//    }
-//    
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        //Advance the animation frame.
-
-    }
-
 }
